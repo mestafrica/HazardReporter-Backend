@@ -7,6 +7,7 @@ import { AxiosError } from "axios";
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState<string>("");
+  const [phonenumber, setPhoneNumber] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
@@ -85,8 +86,7 @@ const SignUp: React.FC = () => {
             <div>
               <label
                 htmlFor="Email"
-                className="block text-sm font-medium text-gray-700"
-              >
+                className="block text-sm font-medium text-gray-700">
                 Email
               </label>
               <input
@@ -97,6 +97,23 @@ const SignUp: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="PhoneNumber"
+                className="block text-sm font-medium text-gray-700">
+                Phone Number
+              </label>
+              <input
+                id="PhoneNumber"
+                pattern="[0-9]{10,15}"
+                name="phonenumber"
+                value={phonenumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Enter your phone number"
                 required
               />
             </div>
@@ -137,10 +154,14 @@ const SignUp: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Confirm Password
               </label>
               <input
+                id="confirmPassword"
                 type="password"
                 name="confirmPassword"
                 value={confirmPassword}
