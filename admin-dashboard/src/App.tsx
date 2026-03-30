@@ -1,32 +1,22 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import DashboardLayout from "./layouts/dashBoardLayout";
-import Home from "./components/Home";
-import Events from "./components/Events";
-import Inbox from "./components/Inbox";
-import Broadcasts from "./components/Broadcasts";
-import Settings from "./components/Settings";
-import Sidebar from "./components/SideBar";
+import AdminDashboardLayout from "./pages/AdminDashboardLayout";
+import AdminDashboardHome from "./pages/AdminDashboardHome";
 import AdminLogin from "./pages/AdminLogin";
 
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/admin-login", // <-- add this route
+      path: "/admin-login",
       element: <AdminLogin />,
     },
     {
-      path: "/sidebar",
-      element: <Sidebar />,
-    },
-    {
       path: "/admin-dashboard",
-      element: <DashboardLayout />,
+      element: <AdminDashboardLayout />,
       children: [
-        { index: true, element: <Home /> },
-        { path: "events", element: <Events /> }, // simplified paths
-        { path: "inbox", element: <Inbox /> },
-        { path: "broadcasts", element: <Broadcasts /> },
-        { path: "settings", element: <Settings /> },
+        {
+          index: true,
+          element: <AdminDashboardHome />,
+        },
       ],
     },
   ]);
