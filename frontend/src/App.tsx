@@ -10,14 +10,13 @@ import Map from "./components/Map";
 import { ROUTES } from "./constants/routes";
 import DashboardHomePage from "./pages/DashboardHomePage";
 import CoordinatesAndLocation from "./components/CoordinatesAndLocation";
-import AdminLogin from "./pages/AdminLogin";
+
 
 export default function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/password-recovery" element={<PasswordRecovery />} />
