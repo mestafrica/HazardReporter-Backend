@@ -38,12 +38,14 @@ export default function HazardForm(props: HazardFormProps) {
     }
   };
 
-  const [locationData, setLocationData] = React.useState({
+const [locationData, setLocationData] = React.useState({
   latitude: "",
   longitude: "",
   city: "",
   country: "",
 });
+
+const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
 
   return (
     <div className="flex flex-col">
@@ -132,12 +134,22 @@ export default function HazardForm(props: HazardFormProps) {
                 id="images"
                 name="images"
                 className="hidden"
-                required
                 multiple
                 accept="image/*"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  setSelectedFiles(files);
+                }}
               />
             </div>
           </div>
+          {selectedFiles.length > 0 && (
+  <div className="mt-2 text-sm text-gray-600">
+    {selectedFiles.map((file) => (
+      <p key={file.name}>{file.name}</p>
+    ))}
+  </div>
+)}
 
           <div className="grid gap-x-4 grid-cols-2">
             <div>

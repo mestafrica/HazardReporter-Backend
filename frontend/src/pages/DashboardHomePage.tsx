@@ -12,8 +12,8 @@ export default function DashboardHomePage() {
     const fetchHazards = async () => {
       try {
         const response = await apiGetAllHazardReports();
-        setHazards(response.data.hazardReports);
-        console.log(response.data.hazardReports);
+        setHazards(response.data);
+        console.log(response.data);
       } catch (err) {
         console.error("Render error:", err);
         return <p className="text-red-500 font-bold">Something went wrong</p>;
@@ -24,7 +24,6 @@ export default function DashboardHomePage() {
   }, []);
 
   return (
-    <>
       <div className="container mx-auto space-y-10">
         <div className="flex gap-x-3 ">
           <div className=" bg-white rounded-md w-2/3">
@@ -71,6 +70,5 @@ export default function DashboardHomePage() {
           {/* <Announcement /> */}
         </div>
       </div>
-    </>
   );
 }
