@@ -1,11 +1,11 @@
-import Swal from "sweetalert2";
-
-
-type HazardFormProps = {
-  onSuccess: () => void;
-};
-
 import React from "react";
+import Swal from "sweetalert2";
+import CoordinatesAndLocation from "./CoordinatesAndLocation";
+
+type HazardFormProps = Readonly<{
+  onSuccess: () => void;
+}>;
+
 import { apiNewHazardReporter } from "../services/api";
 import SubmitButton from "./SubmitButton";
 
@@ -29,6 +29,7 @@ export default function HazardForm(props: HazardFormProps) {
         timer: 1500,
       });
     } catch (error) {
+      console.error("Failed to report hazard:", error);
       Swal.fire({
         icon: "error",
         title: "Failed to Report Hazard",
@@ -36,6 +37,13 @@ export default function HazardForm(props: HazardFormProps) {
       });
     }
   };
+
+  const [locationData, setLocationData] = React.useState({
+  latitude: "",
+  longitude: "",
+  city: "",
+  country: "",
+});
 
   return (
     <div className="flex flex-col">
@@ -143,7 +151,9 @@ export default function HazardForm(props: HazardFormProps) {
                 type="text"
                 id="country"
                 name="country"
-                className="mt-1 w-full px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                value={locationData.country}
+                readOnly
+                className="mt-1 w-full px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
                 required
               />
             </div>
@@ -159,42 +169,35 @@ export default function HazardForm(props: HazardFormProps) {
                 type="text"
                 id="city"
                 name="city"
-                className="mt-1 block w-full px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                value={locationData.city}
+                readOnly
+                className="mt-1 block w-full px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
                 required
               />
             </div>
           </div>
-          <div className="grid gap-x-4 grid-cols-2 mb-3">
-            <div className="">
-              <label
-                className="block text-sm font-medium text-gray-700"
-                htmlFor="longitude"
-              >
-                Longitude
-              </label>
-              <input
-                type="float"
-                id="longitude"
-                name="longitude"
-                className="w-full mt-1 px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              />
-            </div>
+          <div className="w-full">
 
-            <div>
-              <label
-                className="block text-sm font-medium text-gray-700"
-                htmlFor="latitude"
-              >
-                Latitude
-              </label>
-              <input
-                type="float"
-                id="latitude"
-                name="latitude"
-                className="mt-1 block w-full px-3 py-2 mb-4 border text-gray-700 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              ></input>
-            </div>
+          <div className="mb-4">
+           <CoordinatesAndLocation
+              onSelect={(
+              lat: string,
+              lng: string,
+              city: string,
+              country: string
+            ) =>
+            setLocationData({
+            latitude: lat,
+            longitude: lng,
+            city,
+            country,
+    })
+  }
+/>
+          </div>
+
+        <input type="hidden" name="latitude" value={locationData.latitude} />
+        <input type="hidden" name="longitude" value={locationData.longitude} />
           </div>
           <SubmitButton />
         </form>
