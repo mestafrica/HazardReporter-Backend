@@ -11,9 +11,7 @@ const hazardReportSchema: Schema = new Schema({
     city: { type: String, required: true },
     country: { type: String, required: true },
     user: { type: Schema.Types.ObjectId, ref: 'User', required:true },
-    status: String,
-    createdAt: Date,
-    updatedAt: Date,
+    status: String
 }, {
     timestamps: true
 });

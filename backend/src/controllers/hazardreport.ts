@@ -99,31 +99,40 @@ const updateHazardReport = async (req: Request, res: Response, next: NextFunctio
     const hazardReportId = req.params.id;
 
     try {
-        // Validate the data to update a hazard report
         const { error, value } = hazardreportValidator.validate(req.body);
         if (error) {
-            console.error('Validation Error:', error.details[0].message);
             return res.status(400).json({ message: error.details[0].message });
         }
 
-        // Validate the ID format
         if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
             return res.status(400).json({ message: 'Invalid hazard report ID format' });
         }
 
-        // Update the hazard report
-        const updatedHazardReport = await HazardReport.findByIdAndUpdate(hazardReportId, value, { new: true }).exec();
+        const hazardReport = await HazardReport.findById(hazardReportId).exec();
 
-        if (updatedHazardReport) {
-            return res.status(200).json({
-                message: 'Hazard Report updated successfully',
-                hazardReport: updatedHazardReport
-            });
-        } else {
-            return res.status(404).json({
-                message: 'Hazard Report not found'
+        if (!hazardReport) {
+            return res.status(404).json({ message: 'Hazard Report not found' });
+        }
+
+        const oneHour = 60 * 60 * 1000; 
+
+        const timeDifference =
+            Date.now() - new Date(hazardReport.createdAt || new Date()).getTime();
+
+        if (timeDifference > oneHour) {
+            return res.status(403).json({
+                message: 'You can only edit a hazard report within 1 hour of posting it.'
             });
         }
+
+        Object.assign(hazardReport, value);
+        await hazardReport.save();
+
+        return res.status(200).json({
+            message: 'Hazard Report updated successfully',
+            hazardReport
+        });
+
     } catch (error) {
         console.error('Error updating hazard report:', error);
         next(error);
@@ -147,7 +156,7 @@ const getUserHazardCount = async (req: Request, res: Response, next: NextFunctio
         }
 
         // Convert the user ID to a MongoDB ObjectId
-        const userId = new mongoose.Types.ObjectId(jwtId);
+        const userId = mongoose.Types.ObjectId.createFromHexString(jwtId);
 
         // Fetch the hazard reports associated with the user
         const hazardReports = await HazardReport.find({ user: userId }).exec();

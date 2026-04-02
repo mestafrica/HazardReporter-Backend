@@ -18,8 +18,8 @@ export default interface IUser extends Document{
 
  export default interface IReport extends Document{
     userId: Types.ObjectId;
-    reportType:String;
-    description:String;
-    status:String;
-    createdAt:Date;
+    reportType: string;
+    description: string;
+    status: string;
+    createdAt: Date;
 }
