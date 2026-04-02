@@ -1,31 +1,58 @@
-import React, { useState } from "react";
 import Swal from "sweetalert2";
+import React, { useState } from "react";
+import axios from "axios";
 import { apiNewHazardReporter } from "../services/api";
 import SubmitButton from "./SubmitButton";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import CoordinatesAndLocation from "./CoordinatesAndLocation";
 
-type HazardFormProps = Readonly<{
-  onSuccess: () => void;
-}>;
+type HazardFormProps = {
+  readonly onSuccess: () => void;
+};
 
-// 🌿 Main Hazard Form
-export default function HazardForm({ onSuccess }: HazardFormProps) {
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+export default function HazardForm(props: HazardFormProps) {
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
 
-  const navigate = useNavigate();
+  const fetchCountryFromCity = async (cityValue: string) => {
+    if (cityValue.trim().length < 3) {
+      setCountry("");
+      return;
+    }
 
-  const { isLoggedIn } = useAuth();
-  if (!isLoggedIn) {
-    toast.success("Kindly Login to report hazard", {
-      position: "top-right",
-      autoClose: 1500,
-    });
-    setTimeout(() => navigate("/login"), 1500);
-    return null;
-  }
+    try {
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/search`,
+        {
+          params: {
+            city: cityValue,
+            format: "json",
+            addressdetails: 1,
+            limit: 1,
+          },
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.data.length > 0) {
+        const address = response.data[0].address;
+        setCountry(address?.country || "");
+      } else {
+        setCountry("");
+      }
+    } catch (error) {
+      console.error("Error fetching country:", error);
+      setCountry("");
+    }
+  };
+
+  const handleCityChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setCity(value);
+    await fetchCountryFromCity(value);
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,8 +61,12 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
       const form = event.target as HTMLFormElement;
       const formData = new FormData(form);
 
+      formData.set("city", city);
+      formData.set("country", country);
+
       await apiNewHazardReporter(formData);
-      onSuccess();
+
+      props.onSuccess();
 
       Swal.fire({
         icon: "success",
@@ -48,28 +79,23 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
       Swal.fire({
         icon: "error",
         title: "Failed to Report Hazard",
-        text: "Something went wrong!",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong!",
       });
     }
   };
 
-  const [locationData, setLocationData] = useState({
-    latitude: "",
-    longitude: "",
-    city: "",
-    country: "",
-  });
-
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col">
       <div className="space-y-10">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title + Hazard Type */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-x-4 grid-cols-2">
             <div>
               <label
-                htmlFor="title"
                 className="block text-sm font-medium text-gray-700"
+                htmlFor="title"
               >
                 Title
               </label>
@@ -77,27 +103,27 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
                 type="text"
                 id="title"
                 name="title"
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="w-full mt-1 px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 required
               />
             </div>
 
             <div>
               <label
-                htmlFor="hazardtype"
                 className="block text-sm font-medium text-gray-700"
+                htmlFor="hazardtype"
               >
                 Select Hazard Type
               </label>
               <select
                 id="hazardtype"
                 name="hazardtype"
-                className="mt-1 block w-full px-3 py-2 border text-gray-700 border-gray-300 rounded-md shadow-sm 
-                focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
+                className="mt-1 block w-full px-3 py-2 mb-4 border text-gray-700 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                defaultValue=""
               >
-                <option value="">Select from list</option>
+                <option value="" disabled className="text-[#B3B3B3]">
+                  select from list
+                </option>
                 <option value="environmental">Environmental</option>
                 <option value="noise">Noise</option>
                 <option value="accident">Accident</option>
@@ -106,13 +132,11 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
             </div>
           </div>
 
-          {/* Description + Upload */}
-          <div className="flex flex-col sm:flex-row gap-6">
-            {/* Description */}
-            <div className="flex-1">
+          <div className="w-full flex gap-x-4">
+            <div className="w-[52%]">
               <label
-                htmlFor="description"
                 className="block text-sm font-medium text-gray-700"
+                htmlFor="description"
               >
                 Description
               </label>
@@ -120,17 +144,13 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
                 id="description"
                 name="description"
                 placeholder="Describe the hazard here"
-                className="mt-1 block w-full h-40 sm:h-44 md:h-52
-                px-6 py-4 border border-gray-300 rounded-md shadow-sm 
-                focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 rows={4}
                 required
               ></textarea>
             </div>
 
-            {/* Upload Images */}
-            {/* Upload Images */}
-            <div className="flex-1 flex flex-col">
+            <div>
               <label
                 htmlFor="images"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -140,17 +160,10 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
 
               <label
                 htmlFor="images"
-                className="flex flex-col items-center justify-center 
-      w-full h-40 sm:h-44 md:h-52
-      px-6 py-4 border-2 border-dashed border-gray-300 rounded-md 
-      shadow-sm cursor-pointer hover:border-blue-500 hover:text-blue-500 
-      transition-colors duration-200"
+                className="flex flex-col items-center justify-center w-full px-32 py-6 border-2 border-dashed border-gray-300 rounded-md shadow-sm cursor-pointer hover:border-blue-500 hover:text-blue-500"
               >
                 <span className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-3xl text-gray-500">
                   +
-                </span>
-                <span className="mt-2 text-sm text-gray-500">
-                  Click to upload
                 </span>
               </label>
 
@@ -159,55 +172,18 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
                 id="images"
                 name="images"
                 className="hidden"
+                required
                 multiple
                 accept="image/*"
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  setSelectedFiles(files);
-                }}
               />
-
-              {/* Show selected files with remove option */}
-              {selectedFiles.length > 0 && (
-                <div className="mt-2 text-xs text-gray-600 space-y-1">
-                  {selectedFiles.map((file, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between"
-                    >
-                      <span>• {file.name}</span>
-                      <button
-                        type="button"
-                        className="text-red-500 ml-3"
-                        onClick={() => {
-                          const newFiles = selectedFiles.filter(
-                            (_, i) => i !== index
-                          );
-                          setSelectedFiles(newFiles);
-
-                          // update the input's FileList
-                          const dt = new DataTransfer();
-                          newFiles.forEach((f) => dt.items.add(f));
-                          const input = document.getElementById(
-                            "images"
-                          ) as HTMLInputElement;
-                          if (input) input.files = dt.files;
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
           <div className="grid gap-x-4 grid-cols-2">
             <div>
               <label
-                htmlFor="country"
                 className="block text-sm font-medium text-gray-700"
+                htmlFor="country"
               >
                 Country
               </label>
@@ -215,7 +191,7 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
                 type="text"
                 id="country"
                 name="country"
-                value={locationData.country}
+                value={country}
                 readOnly
                 className="mt-1 w-full px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
                 required
@@ -224,8 +200,8 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
 
             <div>
               <label
-                htmlFor="city"
                 className="block text-sm font-medium text-gray-700"
+                htmlFor="city"
               >
                 City
               </label>
@@ -233,36 +209,50 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
                 type="text"
                 id="city"
                 name="city"
-                value={locationData.city}
-                readOnly
-                className="mt-1 block w-full px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
+                value={city}
+                onChange={handleCityChange}
+                className="mt-1 block w-full px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 required
               />
             </div>
           </div>
-          <div className="w-full">
 
-          <div className="mb-4">
-           <CoordinatesAndLocation
-              onSelect={(
-              lat: string,
-              lng: string,
-              city: string,
-              country: string
-            ) =>
-            setLocationData({
-            latitude: lat,
-            longitude: lng,
-            city,
-            country,
-    })
-  }
-/>
+          <div className="grid gap-x-4 grid-cols-2 mb-3">
+            <div>
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="longitude"
+              >
+                Longitude
+              </label>
+              <input
+                type="number"
+                step="any"
+                id="longitude"
+                name="longitude"
+                className="w-full mt-1 px-3 py-2 mb-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="latitude"
+              >
+                Latitude
+              </label>
+              <input
+                type="number"
+                step="any"
+                id="latitude"
+                name="latitude"
+                className="mt-1 block w-full px-3 py-2 mb-4 border text-gray-700 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                required
+              />
+            </div>
           </div>
 
-        <input type="hidden" name="latitude" value={locationData.latitude} />
-        <input type="hidden" name="longitude" value={locationData.longitude} />
-          </div>
           <SubmitButton />
         </form>
       </div>

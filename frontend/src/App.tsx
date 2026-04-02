@@ -19,9 +19,15 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/password-recovery" element={<PasswordRecovery />} />
           <Route
-            path="/co-ordinates-location"
-            element={<CoordinatesAndLocation />}
-          />
+  path="/co-ordinates-location"
+  element={
+    <CoordinatesAndLocation
+      onSelect={(location) => {
+        console.log("Selected location:", location);
+      }}
+    />
+  }
+/>
           <Route path={`${ROUTES.dashboard}`} element={<FrontEndLayout />}>
             <Route path="/" element={<DashboardHomePage />} />
             <Route path="/map" element={<MapPage />} />

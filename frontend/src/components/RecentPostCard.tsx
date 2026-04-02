@@ -1,12 +1,13 @@
-import { CiShare2 } from "react-icons/ci";
+import { CiShare2, CiHeart } from "react-icons/ci";
+import { FaRegCommentDots } from "react-icons/fa";
 import { HazardReport } from "../types/hazardreport";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { CircleArrowUp } from "lucide-react";
 import { apiUpvoteHazard } from "../services/api";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+import { AxiosError } from "axios";
 
 dayjs.extend(relativeTime);
 
@@ -26,6 +27,16 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
 
   const userId = user?.id;
 
+  const hazardUserName =
+    typeof hazard.user === "string"
+      ? hazard.user
+      : hazard.user
+      ? hazard.user.userName ||
+        `${hazard.user.firstName ?? ""} ${hazard.user.lastName ?? ""}`.trim()
+      : null;
+
+  const displayName = hazardUserName || "Anonymous";
+
   // FIXED REAL TIME TOGGLE CHECK
   const hasUpvoted = userId ? upvotedBy.includes(userId) : false;
 
@@ -42,8 +53,8 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
 
       // update list of users that have upvoted
       setUpvotedBy(updated.upvotedBy);
-    } catch (err: any) {
-    const backendMsg = err?.response?.data?.message;
+    } catch (err: unknown) {
+    const backendMsg = (err as AxiosError<{ message: string }>)?.response?.data?.message;
     toast.error(backendMsg || "Upvote failed");
     console.error("Upvote failed:", err);
   }
@@ -58,7 +69,7 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
         />
         <div>
           <h3 className="text-lg font-semibold text-gray-800">
-            {hazard.user ?? "Anonymous"}
+            {displayName}
           </h3>
           <p
             className="text-sm text-gray-500"
@@ -93,9 +104,14 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
       </div>
 
       <div className="flex items-center justify-between text-gray-600">
-        <span className="flex items-center gap-2">
-          <CiHeart /> likes
-        </span>
+        <button
+          onClick={handleUpvote}
+          className={`flex items-center gap-2 ${hasUpvoted ? "text-red-500" : ""}`}
+          type="button"
+          aria-label="Upvote hazard"
+        >
+          <CiHeart /> {upvotes}
+        </button>
         <span className="flex items-center gap-2">
           <FaRegCommentDots /> comment
         </span>
@@ -114,6 +130,6 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
         )}
       </div>
       <ToastContainer />
-    </>
+    </div>
   );
 }

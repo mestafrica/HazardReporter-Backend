@@ -54,7 +54,6 @@ const { user } = useAuth();
   }, []);
 
   return (
-    <>
       <div className="container space-y-10">
         <div className="w-[95%] mx-auto">
           <div className="flex gap-x-4 my-4 md:my-6 ">
