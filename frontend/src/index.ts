@@ -108,25 +108,39 @@ export const recent_posts: Recent_Post[] = [
   ]
 
   export const announcement: Announcement[] = [
-    {   id: "0",
-        title: "title",
-        date: "Thursday 20 November 2024",
-        description: "Lorem ipsum dolor sit amet consectetur. Et aliquet ipsum ut amet sit interdum.",
-        profileImage:"https://s3-alpha-sig.figma.com/img/fbfc/b2ca/07ccc20ea97ac86e53e739e447a3ac7a?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=Imqg1D-tetRZbCyClu6jaN5a0-~N2d-CZ6Z0l9yvey9R14m4H54t0VVO9J37Bx6-Mv5blEFIej6Q-oCzMS7PYQ7rbjR4B1nfrAoovrr5xenzogtdc773Hhy~jQfS37AL3a2JlYv2GabNx2~F53M-JqSAvSqgiNchAL9VEP8EuwXUU2DF~D1MGUmXVZgfM99N4DBGAefgW4JIpRN8xJn4ffXSXsa1Tc-BOsezKbCLY-ctlBJHldG9HJF8F6z8OEDC350ihw~ay04OQlzEfKkInU5XfS3U4H87FwpVCxBjR5h0SWxWu7eTU~6meKMu~hjWZE7Q~jX5FowFaZXtzmXNCQ__",
-        
-      },
-      { id:"1",
-        title: "title",
-        date: "Thursday 20 November 2024",
-        description: "Lorem ipsum dolor sit amet consectetur. Et aliquet ipsum ut amet sit interdum.",
-        profileImage:"https://s3-alpha-sig.figma.com/img/546f/5cbb/afe818c15dedb2fcb5e2825a91f3ca96?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=UuXnsPf1zwsXmzOZusx1jUM-34naA7G8yIMOIm9jYdj-W3z~SBmYKNksl6O1mxQRkzNBU37pEERv0VlB8sB7OSsyf1CStWDdMPrGUO30nq6xmFlEtFOn8gGecR~fUCi3SyrKu3AQ4MQtO3z87jYNIxsvluU~RWDOKFBHwvx~voTWlT9wlrH8eQDQH2gA8FSJ02zkTqR~bhthjPrsNZQRToSdd~hlEmUCd7-5Mc-ZSRswmjqavC0JK0LnQ-Oz4~~kaa-nR1Scmaan7zErnr96bFKrj6p5imCl02nnctJ7DyVzukI7kmJ0vHEB5gsYd5S4L4mY6IFJ4tHc7ZO-QxEzqQ__",
-        
-      },
-      { id:"2",
-        title: "title",
-        date: "Thursday 20 November 2024",
-        description: "Lorem ipsum dolor sit amet consectetur. Et aliquet ipsum ut amet sit interdum.",
-        profileImage:"https://s3-alpha-sig.figma.com/img/546f/5cbb/afe818c15dedb2fcb5e2825a91f3ca96?Expires=1733097600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=UuXnsPf1zwsXmzOZusx1jUM-34naA7G8yIMOIm9jYdj-W3z~SBmYKNksl6O1mxQRkzNBU37pEERv0VlB8sB7OSsyf1CStWDdMPrGUO30nq6xmFlEtFOn8gGecR~fUCi3SyrKu3AQ4MQtO3z87jYNIxsvluU~RWDOKFBHwvx~voTWlT9wlrH8eQDQH2gA8FSJ02zkTqR~bhthjPrsNZQRToSdd~hlEmUCd7-5Mc-ZSRswmjqavC0JK0LnQ-Oz4~~kaa-nR1Scmaan7zErnr96bFKrj6p5imCl02nnctJ7DyVzukI7kmJ0vHEB5gsYd5S4L4mY6IFJ4tHc7ZO-QxEzqQ__",
-        
-      },
+    {
+  id: "0",
+  title: "Flood Alert – High Risk Zones",
+  date: "Thursday 20 November 2024",
+  description: "Heavy rains have caused rising water levels in low-lying areas. Avoid flooded paths and follow safety updates.",
+  profileImage: "https://res.cloudinary.com/dikrqlovc/image/upload/v1763725286/default_lp2rfk.jpg"
+},
+{
+  id: "1",
+  title: "Fire Outbreak Warning – Market Centers",
+  date: "Thursday 20 November 2024",
+  description: "Small fire incidents reported in trading areas. Ensure all electricals are switched off after business hours.",
+  profileImage: "https://res.cloudinary.com/dikrqlovc/image/upload/v1763725390/Fire-outbreak_x0wlns.jpg"
+},
+{
+  id: "2",
+  title: "Road Hazard – Oil Spill Reported",
+  date: "Thursday 20 November 2024",
+  description: "A major oil spill has made a section of the motorway slippery. Motorists should slow down and use alternate routes.",
+  profileImage: "https://res.cloudinary.com/dikrqlovc/image/upload/v1763725457/Oil-spill-cleanup-Freshwater-West-Bay-Dyfed-Wales-1995_p2i5g2.png"
+},
+{
+  id: "3",
+  title: "Strong Wind Alert – Coastal Areas",
+  date: "Thursday 20 November 2024",
+  description: "Strong coastal winds expected. Secure all loose outdoor items and avoid walking near weak structures.",
+  profileImage: "https://res.cloudinary.com/dikrqlovc/image/upload/v1763725515/Paradise-Blog-Photos-2-27_pizfxr.jpg"
+},
+{
+  id: "4",
+  title: "Heatwave Advisory – Stay Hydrated",
+  date: "Thursday 20 November 2024",
+  description: "Temperatures remain high. Limit outdoor activities and check on children, the elderly, and vulnerable persons.",
+  profileImage: "https://res.cloudinary.com/dikrqlovc/image/upload/v1763725547/2048_hkjwaf.webp"
+}
     ]

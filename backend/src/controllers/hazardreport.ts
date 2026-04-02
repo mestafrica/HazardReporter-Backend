@@ -52,19 +52,47 @@ console.log('req.files:', req.files);
 
 const getAllHazardReports = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const hazardReports = await HazardReport.find()
-        .populate('user', 'firstName lastName userName');;
+        // Extract query parameters for filtering and sorting
+        const { 
+            minUpvotes,
+            maxUpvotes,
+            sortBy,
+            order
+        } = req.query;
+
+        // Build filter object
+        const filter: any = {};
+
+        // Add upvote filtering
+        if (minUpvotes || maxUpvotes) {
+            filter.upvotes = {};
+            if (minUpvotes) filter.upvotes.$gte = parseInt(minUpvotes as string);
+            if (maxUpvotes) filter.upvotes.$lte = parseInt(maxUpvotes as string);
+        }
+
+        // Build sort object
+        let sort: any = { createdAt: -1 }; // Default: newest first
+        if (sortBy === 'upvotes') {
+            sort = { upvotes: order === 'asc' ? 1 : -1 };
+        }
+
+        // Fetch hazard reports with filters and sorting
+        const hazardReports = await HazardReport.find(filter)
+            .sort(sort)
+            .populate('user', 'firstName lastName userName');
 
         return res.status(200).json({
             message: 'All Hazard Reports retrieved successfully',
             hazardReports,
-            count: hazardReports.length
+            count: hazardReports.length,
+            filters: { minUpvotes, maxUpvotes, sortBy, order }
         });
     } catch (error) {
         console.error('Error fetching hazard reports:', error);
         next(error);
     }
 };
+
 
 
 const getHazardReportById = async (req: Request, res: Response, next: NextFunction) => {
@@ -192,4 +220,68 @@ const deleteHazardReport = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-export default { createHazardReport, updateHazardReport, getHazardReportById, getAllHazardReports, getUserHazardCount, deleteHazardReport };
+const upvoteHazardReport = async (req: Request, res: Response, next: NextFunction) => {
+    const hazardReportId = req.params.id;
+    try {
+        // Get user ID from JWT
+        const userId = res.locals.jwt?.id;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized: Please login to upvote" });
+        }
+
+        // Validate the ID format
+        if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
+            return res.status(400).json({ message: 'Invalid hazard report ID format' });
+        }
+
+        // Check if the hazard report exists
+        const hazardReport = await HazardReport.findById(hazardReportId).exec();
+
+        if (!hazardReport) {
+            return res.status(404).json({
+                message: 'Hazard Report not found'
+            });
+        }
+
+        // Check if user has already upvoted
+        const hasUpvoted = hazardReport.upvotedBy.some(
+            (id) => id.toString() === userId.toString()
+        );
+
+        if (hasUpvoted) {
+            return res.status(400).json({
+                message: 'You have already upvoted this hazard report',
+                upvotes: hazardReport.upvotes
+            });
+        }
+
+        // Add user to upvotedBy array and increment upvotes
+        const updatedHazardReport = await HazardReport.findByIdAndUpdate(
+            hazardReportId,
+            {
+                $inc: { upvotes: 1 },
+                $push: { upvotedBy: userId }
+            },
+            { new: true }
+        ).exec();
+
+        if (updatedHazardReport) {
+            return res.status(200).json({
+                message: 'Hazard Report upvoted successfully',
+                hazardReport: updatedHazardReport
+            });
+        } else {
+            return res.status(404).json({
+                message: 'Hazard Report not found'
+            });
+        }
+    } catch (error) {
+        console.error('Error upvoting hazard report:', error);
+        next(error);
+    }
+};
+
+
+
+export default { createHazardReport, updateHazardReport, getHazardReportById, getAllHazardReports, getUserHazardCount, deleteHazardReport, upvoteHazardReport };

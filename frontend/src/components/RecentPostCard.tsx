@@ -1,8 +1,12 @@
-import { CiHeart, CiShare2 } from "react-icons/ci";
-import { FaRegCommentDots } from "react-icons/fa6";
+import { CiShare2 } from "react-icons/ci";
 import { HazardReport } from "../types/hazardreport";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { CircleArrowUp } from "lucide-react";
+import { apiUpvoteHazard } from "../services/api";
+import { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 dayjs.extend(relativeTime);
 
@@ -14,6 +18,36 @@ const baseUrl = import.meta.env.VITE_IMAGE_BASE_URL || "";
 
 export default function RecentPostCard({ hazard }: RecentPostProps) {
   const canEdit = dayjs().diff(dayjs(hazard.createdAt), "hour", true) < 1;
+
+  const { user } = useAuth();
+
+  const [upvotes, setUpvotes] = useState(hazard.upvotes ?? 0);
+  const [upvotedBy, setUpvotedBy] = useState<string[]>(hazard.upvotedBy ?? []);
+
+  const userId = user?.id;
+
+  // FIXED REAL TIME TOGGLE CHECK
+  const hasUpvoted = userId ? upvotedBy.includes(userId) : false;
+
+  const handleUpvote = async () => {
+    if (!userId) return toast.error("Please login to upvote");
+
+    try {
+      const res = await apiUpvoteHazard(hazard._id);
+
+      const updated = res.data.hazardReport;
+
+      // update counts
+      setUpvotes(updated.upvotes);
+
+      // update list of users that have upvoted
+      setUpvotedBy(updated.upvotedBy);
+    } catch (err: any) {
+    const backendMsg = err?.response?.data?.message;
+    toast.error(backendMsg || "Upvote failed");
+    console.error("Upvote failed:", err);
+  }
+  };
 
   return (
     <div className="bg-white p-4 border rounded-lg shadow-sm hover:shadow-md transition">
@@ -79,6 +113,7 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
           </span>
         )}
       </div>
-    </div>
+      <ToastContainer />
+    </>
   );
 }

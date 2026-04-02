@@ -4,7 +4,7 @@ import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';
 import User from '../models/user';
 import jwt from 'jsonwebtoken';
-import config from 'config/config';
+import config from '../config/config';
 import signJWT from '../functions/signJWT';
 import bcrypt from "bcrypt";
 import { createUserValidator, forgotPasswordValidator, loginValidator, registerValidator, updateUserValidator } from '../validators/user';
@@ -24,14 +24,14 @@ const isErrorWithMessage = (error: unknown): error is { message: string } => {
 
 // Function to register a user
 const register = async (req: Request, res: Response, next: NextFunction) => {
-       // Validate request
-       const { value, error } = registerValidator.validate(req.body);
-       if (error) {
-           return res.status(422).json(error);
-       }
-    const { firstName, lastName, email, userName, password, confirmPassword } = req.body;
+    // Validate request
+    const { value, error } = registerValidator.validate(req.body);
+    if (error) {
+        return res.status(422).json(error);
+    }
+    const { email, userName, password, confirmPassword } = req.body;
     // Check for all required fields
-    if (!firstName || !lastName || !email || !userName || !password || !confirmPassword) {
+    if (!email || !userName || !password || !confirmPassword) {
         return res.status(400).json({ message: 'All fields are required' });
     }
     // Check if password and confirmPassword match
@@ -40,9 +40,9 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     }
     try {
         // check if user does not exist
-        const userEmail = await User.findOne({email: value.email});
+        const userEmail = await User.findOne({ email: value.email });
         if (userEmail) {
-            return res.status(409).json({ message:'Email already exists!'});
+            return res.status(409).json({ message: 'Email already exists!' });
         }
         // Hash the password
         const hash = await bcryptjs.hashSync(password, 10);
@@ -50,8 +50,6 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         // Create new user
         const _user = new User({
             _id: new mongoose.Types.ObjectId(),
-            firstName,
-            lastName,
             email,
             userName,
             password: hash,
@@ -77,44 +75,44 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 const login = async (req: Request, res: Response, next: NextFunction) => {
     const { userName, password } = req.body;
     try {
-          // Validate request
-          const { value, error } = loginValidator.validate(req.body);
-          if (error) {
-              return res.status(422).json(error);
-          }
+        // Validate request
+        const { value, error } = loginValidator.validate(req.body);
+        if (error) {
+            return res.status(422).json(error);
+        }
         const user = await User.findOne({ userName })
             .exec();
-                if (!user) {
-                    return res.status(401).json({
-                        message: 'Username not found'
-                    });
-                }
-    
-                const isMatch = bcryptjs.compareSync(value.password, user.password)
-                    if (!isMatch) {
-                        return res.status(401).json({
-                            message: 'Password is incorrect'
-                        });
-                    }
-                    // Sign JWT using the signJWT function
-                    signJWT(user, (signError, token) => {
-                        if (signError) {
-                            return res.status(500).json({
-                                message: isErrorWithMessage(signError) ? signError.message : 'Unknown error occurred',
-                                error: signError
-                            });
-                        } else if (token) {
-                            return res.status(200).json({ token });
-                        }
-                    });
-    } catch(err) {
-            logging.error(NAMESPACE, 'Error finding user', err);
-            return res.status(500).json({
-                message: isErrorWithMessage(err) ? err.message : 'Unknown error occurred',
-                error: err
-        
+        if (!user) {
+            return res.status(401).json({
+                message: 'Username not found'
             });
-        };
+        }
+
+        const isMatch = bcryptjs.compareSync(value.password, user.password)
+        if (!isMatch) {
+            return res.status(401).json({
+                message: 'Password is incorrect'
+            });
+        }
+        // Sign JWT using the signJWT function
+        signJWT(user, (signError, token) => {
+            if (signError) {
+                return res.status(500).json({
+                    message: isErrorWithMessage(signError) ? signError.message : 'Unknown error occurred',
+                    error: signError
+                });
+            } else if (token) {
+                return res.status(200).json({ token });
+            }
+        });
+    } catch (err) {
+        logging.error(NAMESPACE, 'Error finding user', err);
+        return res.status(500).json({
+            message: isErrorWithMessage(err) ? err.message : 'Unknown error occurred',
+            error: err
+
+        });
+    };
 };
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -148,11 +146,11 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 const editUser = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
-            // Validate request
-            const { value, error } = updateUserValidator.validate(req.body);
-            if (error) {
-                return res.status(422).json(error);
-            }
+        // Validate request
+        const { value, error } = updateUserValidator.validate(req.body);
+        if (error) {
+            return res.status(422).json(error);
+        }
         const user = await User.findByIdAndUpdate(
             req.params.id,
             value,
@@ -180,7 +178,7 @@ const editUser = async (req: Request, res: Response, next: NextFunction) => {
 
 // Function to delete a user
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
-    const  userId  = req.params.id;
+    const userId = req.params.id;
 
     try {
         const user = await User.findByIdAndDelete(userId).exec();
@@ -205,7 +203,7 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 // get all reports function
 const getAllReports = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const reports = await Report; 
+        const reports = await Report;
         res.status(200).json({ reports, count: reports.length });
     } catch (error) {
         next(error);
@@ -226,7 +224,7 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
         return res.status(500).json({
             message: 'Error processing request',
             error: error instanceof Error ? error.message : String(error)
-            });
+        });
     }
 };
 
@@ -257,4 +255,4 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
 // Function for an admin to create a user
 
 
-export default { register, login, createUser, logout, editUser, deleteUser, getAllUsers,getAllReports };
+export default { register, login, createUser, logout, editUser, deleteUser, getAllUsers, getAllReports };

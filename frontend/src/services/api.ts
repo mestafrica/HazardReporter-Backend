@@ -12,10 +12,20 @@ export const apiGetAllHazardReports = async (): Promise<AxiosResponse<HazardRepo
   return apiClient.get<HazardReport[]>("/hazard-report/getall");
 };
 
+// GET trending hazard reports
+export const apiGetTrendingHazardReports = async (): Promise<AxiosResponse<HazardReport[]>> => {
+  return apiClient.get<HazardReport[]>("/hazard-report/getall?sortBy=upvotes&order=desc");
+};
+
 // GET hazard report by ID
-// export const apiGetHazardReportById = async (id: number): Promise<AxiosResponse<HazardReport>> => {
-//   return apiClient.get<HazardReport>(`/hazard-report/${id}`);
-// };
+export const apiGetHazardReportById = async (id: number): Promise<AxiosResponse<HazardReport>> => {
+  return apiClient.get<HazardReport>(`/hazard-report/${id}`);
+};
+
+// PATCH upvote hazard report by ID
+export const apiUpvoteHazard = async (id: string): Promise<AxiosResponse<HazardReport>> => {
+  return apiClient.patch<HazardReport>(`/hazard-report/upvote/${id}`);
+};
 
 // DELETE hazard report by ID
 // export const apiDeleteHazardReportById = async (id: number): Promise<AxiosResponse<void>> => {
