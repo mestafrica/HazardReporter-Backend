@@ -29,8 +29,8 @@ export default function App() {
   }
 />
           <Route path={`${ROUTES.dashboard}`} element={<FrontEndLayout />}>
-            <Route path="/" element={<DashboardHomePage />} />
-            <Route path="/map" element={<MapPage />} />
+            <Route index element={<DashboardHomePage />} />
+            <Route path="map" element={<MapPage />} />
             <Route path="overview" element={<Overview />} />
             <Route path="settings" element={<Settings />} />
           </Route>

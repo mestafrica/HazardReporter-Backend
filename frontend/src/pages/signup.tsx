@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { apiSignup } from "../services/auth";
 
 const SignUp: React.FC = () => {
-  // const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");

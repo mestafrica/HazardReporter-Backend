@@ -6,60 +6,52 @@ import mongoose, { Schema, Types } from "mongoose";
 // import mongooseToJson from '@reis/mongoose-to-json';
 // import mongooseErrors from "mongoose-errors";
 
-
 const bcryptSalt = process.env.BCRYPT_SALT;
 
 // define  report schema
 const ReportSchema: Schema = new Schema({
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    reportType: {
-        type: String, required: true, enum: ['bug', 'feedback', 'other']
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  reportType: {
+    type: String,
+    required: true,
+    enum: ["bug", "feedback", "other"],
+  },
 
-    },
-
-    description: { type: String, required: true },
-    status: {
-        type: String, enum: ['open', 'in progress', 'resolved'], default:
-            'open'
-    },
-    createdAt: { type: Date, default: Date.now }
+  description: { type: String, required: true },
+  status: {
+    type: String,
+    enum: ["open", "in progress", "resolved"],
+    default: "open",
+  },
+  createdAt: { type: Date, default: Date.now },
 });
 
-
-const UserSchema: Schema = new Schema({
-    firstName: { type: String, required: false },
-    lastName: { type: String, required: false },
+const UserSchema: Schema = new Schema(
+  {
     userName: { type: String, unique: true, required: true },
-    email: { type: String, unique: true, required: true },
+    email: { type: String, unique: true, sparse: true },
+    phoneNumber: { type: String, unique: true, required: true },
     password: { type: String, required: true },
     confirmPassword: { type: String, required: true },
-    role: { type: String, default: 'user', enum: ['admin', 'user'] },
-    reports: [{ type: Types.ObjectId, ref: 'Reports' }],
+    role: { type: String, default: "user", enum: ["admin", "user"] },
+    reports: [{ type: Types.ObjectId, ref: "Reports" }],
     createResetPasswordToken: { type: String },
     passwordChangedAt: { type: Date },
     passwordResetToken: { type: String },
-    passwordResetTokenExpires: { type: Date }
-},
-    {
-        timestamps: true
-    })
-
-
-
-
-
-
+    passwordResetTokenExpires: { type: Date },
+  },
+  {
+    timestamps: true,
+  },
+);
 
 // Apply plugins
 // resetTokenSchema
 //     // .plugin(mongooseErrors)
 //     .plugin(toJSON);
 
-
 // Export Models
-export default mongoose.model<IUser>('User', UserSchema);
-
-
+export default mongoose.model<IUser>("User", UserSchema);
 
 // //create an instance method
 // UserSchema.pre("save", async function (next) {
