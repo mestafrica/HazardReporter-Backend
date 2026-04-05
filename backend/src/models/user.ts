@@ -34,6 +34,7 @@ const UserSchema: Schema = new Schema(
     password: { type: String, required: true },
     confirmPassword: { type: String, required: true },
     role: { type: String, default: "user", enum: ["admin", "user"] },
+    avatar: { type: String, default: "" },
     reports: [{ type: Types.ObjectId, ref: "Reports" }],
     createResetPasswordToken: { type: String },
     passwordChangedAt: { type: Date },

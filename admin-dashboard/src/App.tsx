@@ -5,12 +5,24 @@ import ContentModeration from "./pages/ContentModeration";
 import Announcements from "./pages/Announcements";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
+import AdminLogin from "./pages/AdminLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { DashboardProvider } from "./context/DashboardContext";
+import { Toaster } from "react-hot-toast";
 
 function App() {
     const router = createBrowserRouter([
        {
+        path: "/admin-login",
+        element: <AdminLogin />
+       },
+       {
         path: "/admin-dashboard",
-        element: <DashboardLayout/>,
+        element: (
+          <ProtectedRoute>
+            <DashboardLayout/>
+          </ProtectedRoute>
+        ),
         children: [
             {
                 index: true,
@@ -41,7 +53,12 @@ function App() {
       }
     ]);
 
-    return <RouterProvider router={router} />;
+    return (
+        <DashboardProvider>
+            <RouterProvider router={router} />
+            <Toaster position="top-right" />
+        </DashboardProvider>
+    );
 };
 
 export default App;

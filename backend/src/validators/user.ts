@@ -14,6 +14,7 @@ export const registerValidator = Joi.object({
     .valid(Joi.ref("password"))
     .required()
     .messages({ "any.only": "Passwords do not match" }),
+  avatar: Joi.string().optional(),
 });
 
 export const loginValidator = Joi.object({
@@ -42,6 +43,7 @@ export const createUserValidator = Joi.object({
   email: Joi.string().email().optional(),
   password: Joi.string().required(),
   role: Joi.string().required().valid("admin", "user"),
+  avatar: Joi.string().optional(),
 });
 
 export const updateUserValidator = Joi.object({
@@ -49,6 +51,7 @@ export const updateUserValidator = Joi.object({
   phoneNumber: Joi.string().pattern(/^[0-9+\s\-()]{7,15}$/),
   email: Joi.string().email().optional(),
   role: Joi.string().valid("admin", "user"),
+  avatar: Joi.string().optional(),
 });
 
 export const adminSignupValidator = Joi.object({
@@ -65,6 +68,7 @@ export const adminSignupValidator = Joi.object({
     .valid(Joi.ref("password"))
     .required()
     .messages({ "any.only": "Passwords do not match" }),
+  avatar: Joi.string().optional(),
 });
 
 export const adminSigninValidator = Joi.object({

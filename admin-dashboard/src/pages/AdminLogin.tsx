@@ -1,42 +1,49 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import padlock from "../assets/images/forms/padlock.jpg";
 import { apiAdminLogin } from "../services/auth";
-import axios from "axios"; // importing axios for error checking
+import { useDashboard } from "../context/DashboardContext";
+import toast from "react-hot-toast";
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
+  const { refreshData } = useDashboard();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const saveLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
     try {
-      e.preventDefault();
       const formData = new FormData(e.currentTarget);
       const userName = formData.get("userName") as string | null;
       const password = formData.get("password") as string | null;
 
-      // Ensuring email and password are present
-      if (!userName || !password) {
-        alert(`Email and password are required.`);
-        return;
-      }
+      const response = await apiAdminLogin({ userName, password });
 
-      await apiAdminLogin({ userName, password });
+      if (response.status === 200) {
+        if (response.data.token) {
+          localStorage.setItem("token", response.data.token);
+        }
+        if (response.data.admin) {
+          localStorage.setItem("adminProfile", JSON.stringify(response.data.admin));
+        }
 
-      // Navigate only after successful login
-      navigate("/admin-dashboard");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        alert(`API error: ${error.response?.data}`);
-      } else {
-        alert(`Unexpected error: ${error}`);
+        toast.success("Login successful!");
+        await refreshData();
+        navigate("/admin-dashboard");
       }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || "Login failed";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white shadow-lg rounded-lg">
-        <div className="w-full md:w-1/2 px-12 py-12 space-y-8">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4 md:p-0">
+      <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+        <div className="w-full md:w-1/2 px-6 md:px-12 py-10 md:py-16 space-y-8">
           <h1 className="text-3xl font-bold mb-6 text-blue-700">
             Login to <br />
             The Admin Panel
@@ -56,7 +63,7 @@ const AdminLogin: React.FC = () => {
                 type="text"
                 name="userName"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Enter your email"
+                placeholder="Enter your username"
                 required
               />
             </div>
@@ -82,24 +89,14 @@ const AdminLogin: React.FC = () => {
             </h1>
             <button
               type="submit"
-              className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={isLoading}
+              className={`w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-bold text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${
+                isLoading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              Log In
+              {isLoading ? "Logging in..." : "Log In"}
             </button>
-            <div className="flex items-center justify-between">
-              <Link
-                to="/password-recovery"
-                className="text-sm text-blue-700 hover:underline"
-              >
-                Forgot your password?
-              </Link>
-              <Link
-                to="/admin-signup"
-                className="text-sm text-blue-700 hover:underline"
-              >
-                Sign Up
-              </Link>
-            </div>
+
           </form>
         </div>
         <div className="hidden md:block md:w-1/2">

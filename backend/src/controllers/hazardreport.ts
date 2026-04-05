@@ -20,10 +20,8 @@ const createHazardReport = async (
       ...req.body,
       images:
         (req.files as Express.Multer.File[] | undefined)
-          ?.filter(
-            (file) => file && (file as any).filename && (file as any).path,
-          )
-          ?.map((file) => (file as any).filename) || [],
+          ?.filter((file) => file && (file as any).path)
+          ?.map((file) => (file as any).path) || [],
     });
 
     if (error) {
