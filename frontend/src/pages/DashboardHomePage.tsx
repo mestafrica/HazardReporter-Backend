@@ -19,15 +19,22 @@ const { user } = useAuth();
 
   const [hazards, setHazards] = useState<HazardReport[]>([]);
   const [trendinghazards, setTrendingHazards] = useState<HazardReport[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchHazards = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const response = (await apiGetAllHazardReports()) as unknown as {
         data: HazardResponse;
       };
-      setHazards(response.data.hazardReports);
+      setHazards(response.data.hazardReports || []);
     } catch (err) {
-      console.error("Render error:", err);
+      console.error("Error fetching hazards:", err);
+      setError("Failed to load hazard reports. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,9 +44,9 @@ const { user } = useAuth();
       const response = (await apiGetTrendingHazardReports()) as unknown as {
         data: HazardResponse;
       };
-      setTrendingHazards(response.data.hazardReports);
+      setTrendingHazards(response.data.hazardReports || []);
     } catch (err) {
-      console.error("Render error:", err);
+      console.error("Error fetching trending hazards:", err);
     }
   };
   
@@ -47,11 +54,34 @@ const { user } = useAuth();
   // fetch on mount
   useEffect(() => {
     fetchHazards();
-  }, []);
-  // Trending fetch on mount
-  useEffect(() => {
     getTrendingHazards();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={fetchHazards}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -102,10 +132,15 @@ const { user } = useAuth();
               </a>
             </div>
             <div className="w-[calc(100vw-255px)] overflow-x-scroll flex gap-6">
-              {trendinghazards.length > 0 &&
+              {trendinghazards.length > 0 ? (
                 trendinghazards.map((hazard) => (
                   <TrendingPostCard key={hazard._id} hazard={hazard} />
-                ))}
+                ))
+              ) : (
+                <div className="flex items-center justify-center w-full h-32 text-gray-500">
+                  No trending hazards available
+                </div>
+              )}
             </div>
           </section>
           {/* <HazardReport /> */}
@@ -124,11 +159,21 @@ const { user } = useAuth();
               </div>
 
               <div className="grid grid-cols-1 gap-6">
-                {hazards.length > 0 &&
-                  hazards
-                    .map((hazard) => (
-                      <RecentPostCard key={hazard._id} hazard={hazard} />
-                    ))}
+                {hazards.length > 0 ? (
+                  hazards.map((hazard) => (
+                    <RecentPostCard key={hazard._id} hazard={hazard} />
+                  ))
+                ) : (
+                  <div className="text-center py-12 bg-gray-50 rounded-lg">
+                    <p className="text-gray-500 mb-4">No hazard reports found</p>
+                    <button
+                      onClick={fetchHazards}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                )}
               </div>
             </section>
 

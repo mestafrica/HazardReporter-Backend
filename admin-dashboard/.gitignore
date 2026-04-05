@@ -16,9 +16,9 @@ dist-ssr
 build/
 
 # Environment variables
-.env
-.env.*
+/.env.*
 *.local
+/.env
 
 # Lock files
 package-lock.json
