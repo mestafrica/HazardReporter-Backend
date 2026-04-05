@@ -198,10 +198,13 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
 
         setIsLoading(true);
         try {
-            // Fetch Reports
-            const reportsRes = await apiGetAllReports();
-            if (reportsRes.data && reportsRes.data.hazardReports) {
-                const formattedReports: Report[] = reportsRes.data.hazardReports.map((r: any) => ({
+            const [reportsRes, profileRes] = await Promise.allSettled([
+                apiGetAllReports(),
+                apiGetAdminProfile()
+            ]);
+
+            if (reportsRes.status === 'fulfilled' && reportsRes.value.data?.hazardReports) {
+                const formattedReports: Report[] = reportsRes.value.data.hazardReports.map((r: any) => ({
                     id: r._id,
                     title: r.title || r.hazardtype,
                     location: r.location || `${r.city}, ${r.country}`,
@@ -216,10 +219,8 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
                 setReports(formattedReports);
             }
 
-            // Fetch Profile
-            const profileRes = await apiGetAdminProfile();
-            if (profileRes.data && profileRes.data.admin) {
-                const admin = profileRes.data.admin;
+            if (profileRes.status === 'fulfilled' && profileRes.value.data?.admin) {
+                const admin = profileRes.value.data.admin;
                 const newProfile = {
                     name: admin.userName || "Admin User",
                     email: admin.email || "",
@@ -237,7 +238,16 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
     };
 
     useEffect(() => {
-        refreshData();
+        const loadData = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+            try {
+                await refreshData();
+            } catch (error) {
+                console.error("Failed to load dashboard data:", error);
+            }
+        };
+        loadData();
     }, []);
 
     const generateDate = () => {

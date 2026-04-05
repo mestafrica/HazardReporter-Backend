@@ -344,6 +344,50 @@ const getHazardReportStats = async (
   }
 };
 
+const upvoteHazardReport = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const userId = res.locals.jwt?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const report = await HazardReport.findById(id);
+    if (!report) {
+      return res.status(404).json({ message: "Hazard report not found" });
+    }
+
+    const userObjectId = new Types.ObjectId(userId);
+    const hasUpvoted = report.upvotedBy.some(
+      (uid) => uid.toString() === userObjectId.toString()
+    );
+
+    if (hasUpvoted) {
+      report.upvotes = Math.max(0, report.upvotes - 1);
+      report.upvotedBy = report.upvotedBy.filter(
+        (uid) => uid.toString() !== userObjectId.toString()
+      );
+    } else {
+      report.upvotes += 1;
+      report.upvotedBy.push(userObjectId);
+    }
+
+    await report.save();
+
+    return res.status(200).json({
+      message: hasUpvoted ? "Upvote removed" : "Upvoted",
+      upvotes: report.upvotes,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   createHazardReport,
   updateHazardReport,
@@ -352,4 +396,5 @@ export default {
   getUserHazardCount,
   deleteHazardReport,
   getHazardReportStats,
+  upvoteHazardReport,
 };
