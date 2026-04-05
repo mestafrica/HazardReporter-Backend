@@ -77,7 +77,7 @@ app.use("/api", adminRoutes);
 app.use("/hazard", hazardRoutes);
 app.use("/hazard-report", hazardReport);
 app.use("/api", resetPasswordRoutes);
-app.use("/announcement", announcementRoutes);
+// app.use("/announcement", announcementRoutes);
 
 // Error handling for not found routes
 app.use((req, res, next) => {
