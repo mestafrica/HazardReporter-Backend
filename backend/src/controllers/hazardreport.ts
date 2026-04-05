@@ -7,8 +7,28 @@ import { IHazardReport } from "../interfaces/hazardreport";
 
 const NAMESPACE = "HazardReport";
 
+type UploadedFile = {
+  filename: string;
+  path: string;
+};
+
+type RequestWithFiles = Request & {
+  files?: unknown;
+};
+
+const isUploadedFile = (file: unknown): file is UploadedFile => {
+  return (
+    typeof file === "object" &&
+    file !== null &&
+    "filename" in file &&
+    typeof (file as { filename?: unknown }).filename === "string" &&
+    "path" in file &&
+    typeof (file as { path?: unknown }).path === "string"
+  );
+};
+
 const createHazardReport = async (
-  req: Request,
+  req: RequestWithFiles,
   res: Response,
   next: NextFunction,
 ) => {
@@ -16,14 +36,12 @@ const createHazardReport = async (
     console.log("req.files:", req.files);
     console.log("req.body before processing:", req.body);
 
+    const rawFiles = Array.isArray(req.files) ? req.files : [];
+    const imageNames = rawFiles.filter(isUploadedFile).map((file) => file.filename);
+
     const { error, value } = hazardreportValidator.validate({
       ...req.body,
-      images:
-        (req.files as Express.Multer.File[] | undefined)
-          ?.filter(
-            (file) => file && (file as any).filename && (file as any).path,
-          )
-          ?.map((file) => (file as any).filename) || [],
+      images: imageNames,
     });
 
     if (error) {
@@ -41,13 +59,11 @@ const createHazardReport = async (
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Create hazard report with explicit type
     const hazardReport = (await HazardReport.create({
       ...value,
       user,
     })) as IHazardReport & { _id: Types.ObjectId };
 
-    // Add the new hazard report's ID to the user's reports array
     user.reports.push(hazardReport._id);
     await user.save();
 
@@ -116,49 +132,57 @@ const getHazardReportById = async (
   }
 };
 
-const updateHazardReport = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const hazardReportId = req.params.id;
+const updateHazardReport = async (req: Request, res: Response, next: NextFunction) => {
+    const hazardReportId = req.params.id;
 
-  try {
-    // Validate the data to update a hazard report
-    const { error, value } = hazardreportValidator.validate(req.body);
-    if (error) {
-      console.error("Validation Error:", error.details[0].message);
-      return res.status(400).json({ message: error.details[0].message });
+    try {
+        const { error, value } = hazardreportValidator.validate(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
+            return res.status(400).json({ message: 'Invalid hazard report ID format' });
+        }
+
+        const hazardReport = await HazardReport.findById(hazardReportId).exec();
+
+        if (!hazardReport) {
+            return res.status(404).json({ message: 'Hazard Report not found' });
+        }
+        const userId = res.locals.jwt?.id;
+
+        if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        if (hazardReport.user.toString() !== userId) {
+        return res.status(403).json({ message: "You can only edit your own hazard report." });
+        }
+        const oneHour = 60 * 60 * 1000; 
+
+        const reportWithCreatedAt = hazardReport as unknown as { createdAt: Date };
+        const timeDifference = 
+          Date.now() - new Date(reportWithCreatedAt.createdAt).getTime();
+
+        if (timeDifference > oneHour) {
+            return res.status(403).json({
+                message: 'You can only edit a hazard report within 1 hour of posting it.'
+            });
+        }
+
+        Object.assign(hazardReport, value);
+        await hazardReport.save();
+
+        return res.status(200).json({
+            message: 'Hazard Report updated successfully',
+            hazardReport
+        });
+
+    } catch (error) {
+        console.error('Error updating hazard report:', error);
+        next(error);
     }
-
-    // Validate the ID format
-    if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
-      return res
-        .status(400)
-        .json({ message: "Invalid hazard report ID format" });
-    }
-
-    // Update the hazard report
-    const updatedHazardReport = await HazardReport.findByIdAndUpdate(
-      hazardReportId,
-      value,
-      { new: true },
-    ).exec();
-
-    if (updatedHazardReport) {
-      return res.status(200).json({
-        message: "Hazard Report updated successfully",
-        hazardReport: updatedHazardReport,
-      });
-    } else {
-      return res.status(404).json({
-        message: "Hazard Report not found",
-      });
-    }
-  } catch (error) {
-    console.error("Error updating hazard report:", error);
-    next(error);
-  }
 };
 
 const getUserHazardCount = async (
@@ -182,7 +206,7 @@ const getUserHazardCount = async (
     }
 
     // Convert the user ID to a MongoDB ObjectId
-    const userId = new mongoose.Types.ObjectId(jwtId);
+    const userId = mongoose.Types.ObjectId.createFromHexString(jwtId);
 
     // Fetch the hazard reports associated with the user
     const hazardReports = await HazardReport.find({ user: userId }).exec();

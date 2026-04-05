@@ -7,7 +7,7 @@ const router = express.Router();
 
 
 
-router.post('/create', extractJWT, upload.array('images', 10), controller.createHazardReport);
+router.post('/create', extractJWT, upload.array('images', 10), controller.createHazardReport as express.RequestHandler);
 
 router.get('/user-reports', extractJWT, controller.getUserHazardCount);
 
@@ -17,8 +17,8 @@ router.delete('/delete/:id', extractJWT, checkAdmin, controller.deleteHazardRepo
 router.get('/getall', controller.getAllHazardReports);
 router.get('/getid/:id', controller.getHazardReportById);
 
-router.patch('/upvote/:id', extractJWT, controller.upvoteHazardReport);
+router.patch('/upvote/:id', extractJWT, controller.updateHazardReport);
 
 
 
-export = router;
+export default router;

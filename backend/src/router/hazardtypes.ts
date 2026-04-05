@@ -11,4 +11,4 @@ router.delete('/delete/:id', extractJWT, checkAdmin, controller.deleteHazardType
 router.get('/all', controller.getAllHazardTypes);
 router.get('/:id', controller.getHazardTypeById);
 
-export = router;
+export default router;

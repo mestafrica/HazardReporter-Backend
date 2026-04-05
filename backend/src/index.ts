@@ -10,6 +10,7 @@ import adminRoutes from "./router/admin";
 import resetPasswordRoutes from "./router/resetpassword";
 import hazardRoutes from "./router/hazardtypes";
 import hazardReport from "./router/hazardreport";
+import announcementRoutes from "./router/announcement";
 import cors from "cors";
 import "express-async-errors";
 
