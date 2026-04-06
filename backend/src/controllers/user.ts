@@ -386,16 +386,32 @@ const adminSignin = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+// function for admin to logout
+const adminLogout = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        return res.status(200).json({
+            message: 'Admin logged out successfully. Please remove the token from your client.'
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({
+            message: 'Error processing request',
+            error: error instanceof Error ? error.message : String(error)
+        });
+    }
+};
+
 // Single clean export default.
 export default {
-  register,
-  login,
-  createUser,
-  logout,
-  editUser,
-  deleteUser,
-  getAllUsers,
-  getAllReports,
-  adminSignup,
-  adminSignin,
+    register,
+    login,
+    createUser,
+    logout,
+    editUser,
+    deleteUser,
+    getAllUsers,
+    getAllReports,
+    adminSignup,
+    adminSignin,
+    adminLogout,  
 };

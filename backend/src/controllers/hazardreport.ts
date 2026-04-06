@@ -346,12 +346,55 @@ const getHazardReportStats = async (
   }
 };
 
-export default {
-  createHazardReport,
-  updateHazardReport,
-  getHazardReportById,
-  getAllHazardReports,
-  getUserHazardCount,
-  deleteHazardReport,
-  getHazardReportStats,
+
+
+// Function to update report status
+const updateReportStatus = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        // Validate status value
+        const allowedStatuses = ['open', 'in progress', 'resolved'];
+        if (!status || !allowedStatuses.includes(status)) {
+            return res.status(400).json({ 
+                message: `Invalid status. Allowed values are: ${allowedStatuses.join(', ')}` 
+            });
+        }
+
+        // Validate ID format
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid report ID format' });
+        }
+
+        const updatedReport = await HazardReport.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true }
+        ).populate('user', 'userName phoneNumber email');
+
+        if (!updatedReport) {
+            return res.status(404).json({ message: 'Hazard report not found' });
+        }
+
+        return res.status(200).json({
+            message: 'Report status updated successfully',
+            report: updatedReport
+        });
+
+    } catch (error) {
+        console.error('Error updating report status:', error);
+        next(error);
+    }
+};
+
+export default { 
+    createHazardReport, 
+    updateHazardReport, 
+    getHazardReportById, 
+    getAllHazardReports, 
+    getUserHazardCount, 
+    deleteHazardReport,
+    getHazardReportStats,
+    updateReportStatus
 };
