@@ -17,6 +17,8 @@ router.delete('/delete/:id', extractJWT, checkAdmin, controller.deleteHazardRepo
 router.get('/getall', controller.getAllHazardReports);
 router.get('/getid/:id', controller.getHazardReportById);
 
+router.patch('/upvote/:id', extractJWT, controller.upvoteHazardReport);
+
 
 
 export = router;

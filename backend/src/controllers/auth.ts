@@ -19,7 +19,7 @@ const token = async (req: Request, res: Response, next: NextFunction) => {
     }
     // Find a user with their unique identifier
     const user = await IUser.findOne({
-      $or: [{ username: value.username }, { email: value.email }],
+      $or: [{ userName: value.userName }, { email: value.email }],
     });
     if (!user) {
       return res.status(401).json("User Not Found");

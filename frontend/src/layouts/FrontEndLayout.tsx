@@ -4,17 +4,16 @@ import Navbar from "../components/Navbar";
 
 const FrontEndLayout: React.FC = () => {
   return (
-    <div className="flex h-screen">
+    <div className="w-full">
       <div>
         <Sidebar />
       </div>
-
-      <div className="flex-1 flex flex-col">
-        <div>
+      <div className="flex flex-col md:ml-[15%]">
+        <div className="w-full">
           <Navbar />
         </div>
 
-        <div className="flex-1 p-6 bg-[#f6f6f6]">
+        <div className=" bg-[#f6f6f6]">
           <Outlet />
         </div>
       </div>
