@@ -1,6 +1,6 @@
 import React from "react";
+import hazardImage from "../assets/images/antoine-giret-7_TSzqJms4w-unsplash.jpg";
 import { useNavigate } from "react-router-dom";
-import padlock from "../assets/images/forms/padlock.jpg";
 import { apiAdminLogin } from "../services/auth";
 import { useDashboard } from "../context/DashboardContext";
 import toast from "react-hot-toast";
@@ -41,6 +41,16 @@ const AdminLogin: React.FC = () => {
   };
 
   return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white shadow-xl rounded-xl overflow-hidden">
+        {/* Left Form Section */}
+        <div className="w-full md:w-1/2 px-10 py-12 bg-white">
+          <h1 className="text-4xl font-bold text-blue-800 mb-6">
+            Admin Panel
+          </h1>
+        </div>
+      </div>
+
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4 md:p-0">
       <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
         <div className="w-full md:w-1/2 px-6 md:px-12 py-10 md:py-16 space-y-8">
@@ -49,8 +59,10 @@ const AdminLogin: React.FC = () => {
             The Admin Panel
             <br />
           </h1>
-
-          <form onSubmit={saveLogin} className="space-y-6">
+          <p className="text-gray-600 mb-8">
+            Sign in to manage environmental hazard reports securely.
+          </p>
+          <form className="space-y-6">
             <div>
               <label
                 htmlFor="userName"
@@ -62,6 +74,8 @@ const AdminLogin: React.FC = () => {
                 id="userName"
                 type="text"
                 name="userName"
+                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Enter your username"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your username"
                 required
@@ -78,17 +92,14 @@ const AdminLogin: React.FC = () => {
                 id="password"
                 type="password"
                 name="password"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your password"
                 required
               />
             </div>
-            <h1 className="text-sm text-gray-500">
-              By completing this survey you are consenting to storing and using
-              your data to help us improve our services to you.
-            </h1>
             <button
               type="submit"
+              className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
               disabled={isLoading}
               className={`w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-bold text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${
                 isLoading ? "opacity-70 cursor-not-allowed" : ""
@@ -96,17 +107,28 @@ const AdminLogin: React.FC = () => {
             >
               {isLoading ? "Logging in..." : "Log In"}
             </button>
+            <div className="text-right">
+              <a
+                href="/password-recovery"
+                className="text-sm text-blue-600 hover:underline"
+              >
+                Forgot your password?
+              </a>
+            </div>
 
           </form>
         </div>
-        <div className="hidden md:block md:w-1/2">
+
+        {/* Right Image / Illustration Section */}
+        <div className="hidden md:flex md:w-1/2 bg-green-50 items-center justify-center">
           <img
-            src={padlock}
-            alt="Lock"
-            className="object-cover w-full h-full rounded-r-lg"
+            src={hazardImage}
+            alt="Environmental Illustration"
+            className="object-cover h-full w-full"
           />
         </div>
       </div>
+    </div>
     </div>
   );
 };

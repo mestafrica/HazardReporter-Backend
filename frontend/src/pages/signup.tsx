@@ -6,6 +6,7 @@ import { apiSignup } from "../services/auth";
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState<string>("");
+  const [phonenumber, setPhoneNumber] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -87,8 +88,7 @@ const SignUp: React.FC = () => {
             <div>
               <label
                 htmlFor="Email"
-                className="block text-sm font-medium text-gray-700"
-              >
+                className="block text-sm font-medium text-gray-700">
                 Email
               </label>
               <input
@@ -139,6 +139,7 @@ const SignUp: React.FC = () => {
                 Confirm Password<span className="text-red-500">*</span>
               </label>
               <input
+                id="confirmPassword"
                 type="password"
                 name="confirmPassword"
                 value={confirmPassword}
