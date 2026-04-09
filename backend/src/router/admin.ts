@@ -3,12 +3,12 @@ import controller from "../controllers/user";
 import hazardReportController from "../controllers/hazardreport";
 import { checkAuth, hasPermission } from "../middlewares/auth";
 import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
-import { 
-    createAnnouncement, 
-    getAllAnnouncements, 
-    getAnnouncementById, 
-    updateAnnouncement, 
-    deleteAnnouncement 
+import {
+  createAnnouncement,
+  getAllAnnouncements,
+  getAnnouncementById,
+  updateAnnouncement,
+  deleteAnnouncement,
 } from "../controllers/announcement";
 import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
 
@@ -33,39 +33,33 @@ router.get(
   hazardReportController.getHazardReportStats,
 );
 router.patch(
-    "/admin/reports/:id/status",         
-    checkAuth,
-    hasPermission("update_report_status"),
-    hazardReportController.updateReportStatus
+  "/admin/reports/:id/status",
+  checkAuth,
+  hasPermission("update_report_status"),
+  hazardReportController.updateReportStatus,
 );
 
 // Announcement Routes (for admin only)
 router.post(
-    "/admin/announcements",              
-    extractJWT,
-    checkAdmin,
-    uploadAnnouncementFiles.array("attachments", 5),
-    createAnnouncement
+  "/admin/announcements",
+  extractJWT,
+  checkAdmin,
+  uploadAnnouncementFiles.array("attachments", 5),
+  createAnnouncement,
 );
-router.get(
-    "/admin/announcements",            
-    getAllAnnouncements
-);
-router.get(
-    "/admin/announcements/:id",          
-    getAnnouncementById
-);
+router.get("/admin/announcements", getAllAnnouncements);
+router.get("/admin/announcements/:id", getAnnouncementById);
 router.patch(
-    "/admin/announcements/:id",         
-    extractJWT,
-    checkAdmin,
-    uploadAnnouncementFiles.array("attachments", 5),
-    updateAnnouncement
+  "/admin/announcements/:id",
+  extractJWT,
+  checkAdmin,
+  uploadAnnouncementFiles.array("attachments", 5),
+  updateAnnouncement,
 );
 router.delete(
-    "/admin/announcements/:id",         
-    extractJWT,
-    checkAdmin,
-    deleteAnnouncement
+  "/admin/announcements/:id",
+  extractJWT,
+  checkAdmin,
+  deleteAnnouncement,
 );
 export default router;

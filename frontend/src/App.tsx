@@ -10,6 +10,7 @@ import DashboardHomePage from "./pages/DashboardHomePage";
 import CoordinatesAndLocation from "./components/CoordinatesAndLocation";
 import MapPage from "./pages/mapPage";
 
+
 export default function App() {
   return (
     <BrowserRouter>

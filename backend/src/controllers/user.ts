@@ -60,6 +60,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const hash = bcryptjs.hashSync(password, 10);
+    const avatar = req.file ? (req.file as any).path : "";
 
     const _user = new User({
       _id: new mongoose.Types.ObjectId(),
@@ -68,6 +69,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
       email,
       password: hash,
       confirmPassword: hash,
+      avatar,
     });
 
     const user = await _user.save();
@@ -134,10 +136,12 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     }
     // Encrypt user password
     const hashedPassword = bcryptjs.hashSync(value.password, 10);
+    const avatar = req.file ? (req.file as any).path : "";
     // Create user
     await User.create({
       ...value,
       password: hashedPassword,
+      avatar,
     });
     // Send email to user
     // await mailTransport.sendMail({
@@ -159,6 +163,9 @@ const editUser = async (req: Request, res: Response, next: NextFunction) => {
     const { value, error } = updateUserValidator.validate(req.body);
     if (error) {
       return res.status(422).json(error);
+    }
+    if (req.file) {
+      value.avatar = (req.file as any).path;
     }
     const user = await User.findByIdAndUpdate(req.params.id, value, {
       new: true,
@@ -296,6 +303,7 @@ const adminSignup = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const hash = bcryptjs.hashSync(password, 10);
+    const avatar = req.file ? (req.file as any).path : "";
 
     const _admin = new User({
       _id: new mongoose.Types.ObjectId(),
@@ -305,6 +313,7 @@ const adminSignup = async (req: Request, res: Response, next: NextFunction) => {
       password: hash,
       confirmPassword: hash,
       role: "admin",
+      avatar,
     });
 
     const admin = await _admin.save();
@@ -373,6 +382,7 @@ const adminSignin = async (req: Request, res: Response, next: NextFunction) => {
             phoneNumber: user.phoneNumber,
             email: user.email,
             role: user.role,
+            avatar: user.avatar,
           },
         });
       }
@@ -388,30 +398,31 @@ const adminSignin = async (req: Request, res: Response, next: NextFunction) => {
 
 // function for admin to logout
 const adminLogout = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        return res.status(200).json({
-            message: 'Admin logged out successfully. Please remove the token from your client.'
-        });
-    } catch (error) {
-        console.error('Error:', error);
-        return res.status(500).json({
-            message: 'Error processing request',
-            error: error instanceof Error ? error.message : String(error)
-        });
-    }
+  try {
+    return res.status(200).json({
+      message:
+        "Admin logged out successfully. Please remove the token from your client.",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({
+      message: "Error processing request",
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 };
 
 // Single clean export default.
 export default {
-    register,
-    login,
-    createUser,
-    logout,
-    editUser,
-    deleteUser,
-    getAllUsers,
-    getAllReports,
-    adminSignup,
-    adminSignin,
-    adminLogout,  
+  register,
+  login,
+  createUser,
+  logout,
+  editUser,
+  deleteUser,
+  getAllUsers,
+  getAllReports,
+  adminSignup,
+  adminSignin,
+  adminLogout,
 };

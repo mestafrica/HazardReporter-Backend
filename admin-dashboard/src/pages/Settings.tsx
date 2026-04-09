@@ -3,6 +3,7 @@ import { FiMail, FiMessageSquare, FiBell, FiShield, FiSmartphone, FiMonitor, FiM
 import toast from "react-hot-toast";
 import adminDashboard from '../assets/images/adminDashboard.jpg';
 import { useDashboard } from "../context/DashboardContext";
+import { apiUpdateAdminProfile } from "../services/auth";
 
 const Settings: React.FC = () => {
   const { userProfile, updateUserProfile } = useDashboard();
@@ -14,6 +15,8 @@ const Settings: React.FC = () => {
   });
 
   const [profileImage, setProfileImage] = useState<string | null>(userProfile.avatar || null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [notifications, setNotifications] = useState({
     email: true,
     sms: false,
@@ -43,25 +46,41 @@ const Settings: React.FC = () => {
         return;
       }
       
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        const imageUrl = reader.result as string;
-        setProfileImage(imageUrl);
-        updateUserProfile({ avatar: imageUrl });
-        toast.success('Profile photo updated!');
+        setProfileImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSave = () => {
-    updateUserProfile({
-      name: profile.name,
-      email: profile.email,
-      phone: profile.phone,
-      avatar: profileImage || undefined
-    });
-    toast.success("Settings saved successfully!");
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const formData = new FormData();
+      formData.append("userName", profile.name); // Using userName as name field for backend
+      formData.append("email", profile.email);
+      formData.append("phoneNumber", profile.phone);
+      if (selectedFile) {
+        formData.append("avatar", selectedFile);
+      }
+
+      const response = await apiUpdateAdminProfile(formData);
+      if (response.status === 200) {
+        updateUserProfile({
+          name: profile.name,
+          email: profile.email,
+          phone: profile.phone,
+          avatar: profileImage || undefined
+        });
+        toast.success("Settings saved successfully!");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to save settings");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDeactivate = () => {
@@ -370,9 +389,10 @@ const Settings: React.FC = () => {
         </button>
         <button 
           onClick={handleSave}
-          className="px-6 py-2 bg-brand-blue text-white rounded-lg text-sm font-bold shadow-sm hover:bg-blue-700 transition-colors"
+          disabled={isSaving}
+          className={`px-6 py-2 bg-brand-blue text-white rounded-lg text-sm font-bold shadow-sm hover:bg-blue-700 transition-colors ${isSaving ? 'opacity-70 cursor-not-allowed' : ''}`}
         >
-          Save Changes
+          {isSaving ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
     </div>

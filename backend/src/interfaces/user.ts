@@ -8,6 +8,7 @@ export default interface IUser extends Document {
   password: string;
   confirmPassword: string;
   role: "admin" | "user";
+  avatar?: string;
   reports: Types.ObjectId[];
   createResetPasswordToken?: string;
   passwordChangedAt?: Date;

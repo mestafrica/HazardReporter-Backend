@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { apiGetAllReports } from '../services/reports';
+import { apiGetAdminProfile } from '../services/auth';
+import { baseUrl } from '../services/config';
 
 export interface Attachment {
     url: string;
@@ -67,6 +70,8 @@ interface DashboardContextType {
     deleteReport: (id: string) => void;
     deleteAnnouncement: (id: number) => void;
     updateUserProfile: (updates: Partial<UserProfile>) => void;
+    refreshData: () => Promise<void>;
+    isLoading: boolean;
 }
 
 const INITIAL_REPORTS: Report[] = [
@@ -159,16 +164,91 @@ const INITIAL_ANNOUNCEMENTS: Announcement[] = [
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
-const INITIAL_USER_PROFILE: UserProfile = {
-    name: "Sarah Johnson",
-    email: "sarah.johnson@ghhazard.com",
-    phone: "+233 55 123 4567"
+const loadUserProfileFromStorage = (): UserProfile => {
+    const stored = localStorage.getItem("adminProfile");
+    if (stored) {
+        try {
+            const admin = JSON.parse(stored);
+            return {
+                name: admin.userName || "Admin User",
+                email: admin.email || "admin@ghhazard.com",
+                phone: admin.phoneNumber || "+233 00 000 0000",
+                avatar: admin.avatar || "",
+            };
+        } catch (e) {
+            console.error("Failed to parse admin profile", e);
+        }
+    }
+    return {
+        name: "Sarah Johnson",
+        email: "sarah.johnson@ghhazard.com",
+        phone: "+233 55 123 4567"
+    };
 };
 
 export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [reports, setReports] = useState<Report[]>(INITIAL_REPORTS);
     const [announcements, setAnnouncements] = useState<Announcement[]>(INITIAL_ANNOUNCEMENTS);
-    const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_USER_PROFILE);
+    const [userProfile, setUserProfile] = useState<UserProfile>(loadUserProfileFromStorage());
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const refreshData = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        setIsLoading(true);
+        try {
+            const [reportsRes, profileRes] = await Promise.allSettled([
+                apiGetAllReports(),
+                apiGetAdminProfile()
+            ]);
+
+            if (reportsRes.status === 'fulfilled' && reportsRes.value.data?.hazardReports) {
+                const formattedReports: Report[] = reportsRes.value.data.hazardReports.map((r: any) => ({
+                    id: r._id,
+                    title: r.title || r.hazardtype,
+                    location: r.location || `${r.city}, ${r.country}`,
+                    name: r.user ? `${r.user.firstName || ''} ${r.user.lastName || ''}`.trim() || r.user.userName : "Unknown",
+                    date: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    time: new Date(r.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    status: r.status,
+                    category: r.hazardtype,
+                    attachmentUrl: r.images && r.images.length > 0 ? (r.images[0].startsWith('http') ? r.images[0] : `${baseUrl}/${r.images[0]}`) : undefined,
+                    locationData: { text: r.location, city: r.city, country: r.country }
+                }));
+                setReports(formattedReports);
+            }
+
+            if (profileRes.status === 'fulfilled' && profileRes.value.data?.admin) {
+                const admin = profileRes.value.data.admin;
+                const newProfile = {
+                    name: admin.userName || "Admin User",
+                    email: admin.email || "",
+                    phone: admin.phoneNumber || "",
+                    avatar: admin.avatar ? (admin.avatar.startsWith('http') ? admin.avatar : `${baseUrl}/${admin.avatar}`) : "",
+                };
+                setUserProfile(newProfile);
+                localStorage.setItem("adminProfile", JSON.stringify(admin));
+            }
+        } catch (error) {
+            console.error("Error refreshing dashboard data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const loadData = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+            try {
+                await refreshData();
+            } catch (error) {
+                console.error("Failed to load dashboard data:", error);
+            }
+        };
+        loadData();
+    }, []);
 
     const generateDate = () => {
         const d = new Date();
@@ -238,7 +318,9 @@ export const DashboardProvider: React.FC<{ children: ReactNode }> = ({ children 
             updateAnnouncement,
             deleteReport,
             deleteAnnouncement,
-            updateUserProfile
+            updateUserProfile,
+            refreshData,
+            isLoading
         }}>
             {children}
         </DashboardContext.Provider>

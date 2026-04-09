@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaBell, FaSearch, FaAngleDown, FaTimes, FaFileAlt, FaBullhorn, FaUser } from 'react-icons/fa';
+import { FaBell, FaSearch, FaAngleDown, FaTimes, FaFileAlt, FaBullhorn, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import adminDashboard from '../assets/images/adminDashboard.jpg';
 import { useDashboard } from '../context/DashboardContext';
@@ -20,7 +20,9 @@ const TopBar: React.FC = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
   
   const notifications = [
     { id: 1, text: 'New report submitted from Accra Central', time: '2 mins ago', unread: true },
@@ -36,11 +38,20 @@ const TopBar: React.FC = () => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowResults(false);
       }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
     };
     
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("adminProfile");
+    navigate("/admin-login");
+  };
 
   useEffect(() => {
     if (searchQuery.trim().length >= 2) {
@@ -213,16 +224,37 @@ const TopBar: React.FC = () => {
           )}
         </div>
         
-        <div className="flex items-center space-x-3 cursor-pointer">
-          <img
-            src={userProfile.avatar || adminDashboard}
-            alt={userProfile.name}
-            className="h-9 w-9 rounded-full object-cover border border-gray-200"
-          />
-          <div className="flex items-center space-x-1">
-            <span className="text-sm font-medium text-gray-700">{userProfile.name}</span>
-            <FaAngleDown className="text-gray-400 text-xs" />
+        <div className="relative" ref={profileRef}>
+          <div 
+            className="flex items-center space-x-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition-colors"
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+          >
+            <img
+              src={userProfile.avatar || adminDashboard}
+              alt={userProfile.name}
+              className="h-9 w-9 rounded-full object-cover border border-gray-200"
+            />
+            <div className="flex items-center space-x-1">
+              <span className="text-sm font-medium text-gray-700">{userProfile.name}</span>
+              <FaAngleDown className={`text-gray-400 text-xs transition-transform duration-200 ${showProfileMenu ? 'rotate-180' : ''}`} />
+            </div>
           </div>
+
+          {showProfileMenu && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-30">
+              <div className="px-4 py-2 border-b border-gray-100">
+                <p className="text-sm font-medium text-gray-900">{userProfile.name}</p>
+                <p className="text-xs text-gray-500 truncate">{userProfile.email}</p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors mt-1"
+              >
+                <FaSignOutAlt />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
