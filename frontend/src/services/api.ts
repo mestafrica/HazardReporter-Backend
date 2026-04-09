@@ -12,12 +12,24 @@ export const apiGetAllHazardReports = async (): Promise<AxiosResponse<HazardRepo
   return apiClient.get<HazardReport[]>("/hazard-report/getall");
 };
 
-// GET hazard report by ID
-// export const apiGetHazardReportById = async (id: number): Promise<AxiosResponse<HazardReport>> => {
-//   return apiClient.get<HazardReport>(`/hazard-report/${id}`);
-// };
+// GET trending hazard reports
+export const apiGetTrendingHazardReports = async (): Promise<AxiosResponse<HazardReport[]>> => {
+  return apiClient.get<HazardReport[]>("/hazard-report/getall?sortBy=upvotes&order=desc");
+};
 
-// DELETE hazard report by ID
-// export const apiDeleteHazardReportById = async (id: number): Promise<AxiosResponse<void>> => {
-//   return apiClient.delete<void>(`/hazard-report/${id}`);
-// };
+// GET hazard report by ID
+export const apiGetHazardReportById = async (id: number): Promise<AxiosResponse<HazardReport>> => {
+  return apiClient.get<HazardReport>(`/hazard-report/${id}`);
+};
+
+// PATCH upvote hazard report by ID
+export const apiUpvoteHazard = async (id: string): Promise<AxiosResponse<HazardReport>> => {
+  return apiClient.patch<HazardReport>(`/hazard-report/upvote/${id}`);
+};
+
+export const apiUpdateHazardReport = async (
+  hazardId: string,
+  payload: { title: string; description: string }
+) => {
+  return apiClient.patch(`/hazard-report/update/${hazardId}`, payload);
+};
