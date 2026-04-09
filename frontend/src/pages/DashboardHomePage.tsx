@@ -3,11 +3,11 @@ import PostHazzardReportUi from "../components/PostHazzardReportUi";
 import RecentPostCard from "../components/RecentPostCard";
 import TrendingPostCard from "../components/TrendingPostCard";
 import { HazardReport } from "../types/hazardreport";
-import { apiGetAllHazardReports, apiGetTrendingHazardReports } from "../services/api";
+import { apiGetAllHazardReports, apiGetTrendingHazardReports, apiUpdateHazardReport, } from "../services/api";
 import { announcement } from "..";
 import AirQuality from "../components/AirQuality";
 import { useAuth } from "../context/AuthContext";
-// import landingImage from '../assets/images/landing.png';
+
 
 // Define the expected API response
 interface HazardResponse {
@@ -16,11 +16,47 @@ interface HazardResponse {
 
 export default function DashboardHomePage() {
 const { user } = useAuth();
-
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [selectedHazard, setSelectedHazard] = useState<HazardReport | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [hazards, setHazards] = useState<HazardReport[]>([]);
   const [trendinghazards, setTrendingHazards] = useState<HazardReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleEdit = (hazard: HazardReport) => {
+  setSelectedHazard(hazard);
+  setIsEditModalOpen(true);
+};
+
+  const handleSaveEdit = async () => {
+  if (!selectedHazard) return;
+
+  try {
+    await apiUpdateHazardReport(selectedHazard._id, {
+      title: editTitle,
+      description: editDescription,
+    });
+
+    setHazards((prev) =>
+      prev.map((hazard) =>
+        hazard._id === selectedHazard._id
+          ? {
+              ...hazard,
+              title: editTitle,
+              description: editDescription,
+            }
+          : hazard
+      )
+    );
+
+    setIsEditModalOpen(false);
+    setSelectedHazard(null);
+  } catch (err) {
+    console.error("Failed to update hazard:", err);
+  }
+};
 
   const fetchHazards = async () => {
     try {
@@ -56,6 +92,13 @@ const { user } = useAuth();
     fetchHazards();
     getTrendingHazards();
   }, []);
+  
+  useEffect(() => {
+  if (selectedHazard) {
+    setEditTitle(selectedHazard.title);
+    setEditDescription(selectedHazard.description);
+  }
+}, [selectedHazard]);
 
   if (loading) {
     return (
@@ -160,8 +203,12 @@ const { user } = useAuth();
               <div className="grid grid-cols-1 gap-6">
                 {hazards.length > 0 ? (
                   hazards.map((hazard) => (
-                    <RecentPostCard key={hazard._id} hazard={hazard} />
-                  ))
+                    <RecentPostCard
+                      key={hazard._id}
+                      hazard={hazard}
+                      onEdit={handleEdit}
+                    />
+                    ))
                 ) : (
                   <div className="text-center py-12 bg-gray-50 rounded-lg">
                     <p className="text-gray-500 mb-4">No hazard reports found</p>
@@ -214,6 +261,41 @@ const { user } = useAuth();
             </section>
           </div>
         </div>
+        {isEditModalOpen && selectedHazard && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-xl w-[400px]">
+      <h2 className="text-lg font-semibold mb-4">Edit Hazard</h2>
+
+      <input
+        value={editTitle}
+        onChange={(e) => setEditTitle(e.target.value)}
+        className="w-full border p-2 rounded mb-3"
+      />
+
+      <textarea
+         value={editDescription}
+         onChange={(e) => setEditDescription(e.target.value)}
+         className="w-full border p-2 rounded mb-3"
+      />
+
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => setIsEditModalOpen(false)}
+          className="px-3 py-1 bg-gray-300 rounded"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleSaveEdit}
+          className="px-3 py-1 bg-blue-600 text-white rounded"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
   );
 }

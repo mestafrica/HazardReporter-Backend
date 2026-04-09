@@ -13,11 +13,15 @@ dayjs.extend(relativeTime);
 
 interface RecentPostProps {
   hazard: HazardReport;
+  onEdit?: (hazard: HazardReport) => void;
 }
 
 const baseUrl = import.meta.env.VITE_IMAGE_BASE_URL || "";
 
-export default function RecentPostCard({ hazard }: RecentPostProps) {
+export default function RecentPostCard({
+  hazard,
+  onEdit,
+}: RecentPostProps) {
   const canEdit = dayjs().diff(dayjs(hazard.createdAt), "hour", true) < 1;
 
   const { user } = useAuth();
@@ -37,27 +41,30 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
 
   const displayName = hazardUserName || "Anonymous";
 
-  // FIXED REAL TIME TOGGLE CHECK
   const hasUpvoted = userId ? upvotedBy.includes(userId) : false;
 
   const handleUpvote = async () => {
-    if (!userId) return toast.error("Please login to upvote");
+    if (!userId) {
+      toast.error("Please login to upvote");
+      return;
+    }
 
     try {
       const res = await apiUpvoteHazard(hazard._id);
-
       const updated = res.data.hazardReport;
 
-      // update counts
       setUpvotes(updated.upvotes);
-
-      // update list of users that have upvoted
       setUpvotedBy(updated.upvotedBy);
     } catch (err: unknown) {
-    const backendMsg = (err as AxiosError<{ message: string }>)?.response?.data?.message;
-    toast.error(backendMsg || "Upvote failed");
-    console.error("Upvote failed:", err);
-  }
+      const backendMsg = (err as AxiosError<{ message: string }>)?.response?.data?.message;
+      toast.error(backendMsg || "Upvote failed");
+      console.error("Upvote failed:", err);
+    }
+  };
+
+  const handleEditClick = () => {
+    if (!canEdit) return;
+    onEdit?.(hazard);
   };
 
   return (
@@ -112,15 +119,21 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
         >
           <CiHeart /> {upvotes}
         </button>
+
         <span className="flex items-center gap-2">
           <FaRegCommentDots /> comment
         </span>
+
         <span className="flex items-center gap-2">
           <CiShare2 /> shares
         </span>
 
         {canEdit ? (
-          <button className="text-blue-600 text-sm font-medium hover:underline">
+          <button
+            onClick={handleEditClick}
+            className="text-blue-600 text-sm font-medium hover:underline"
+            type="button"
+          >
             Edit
           </button>
         ) : (
@@ -129,6 +142,7 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
           </span>
         )}
       </div>
+
       <ToastContainer />
     </div>
   );

@@ -133,56 +133,66 @@ const getHazardReportById = async (
 };
 
 const updateHazardReport = async (req: Request, res: Response, next: NextFunction) => {
-    const hazardReportId = req.params.id;
+  console.log("UPDATE ROUTE HIT");
 
-    try {
-        const { error, value } = hazardreportValidator.validate(req.body);
-        if (error) {
-            return res.status(400).json({ message: error.details[0].message });
-        }
+  const hazardReportId = req.params.id;
+  console.log("hazardReportId:", hazardReportId);
+  console.log("req.body:", req.body);
 
-        if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
-            return res.status(400).json({ message: 'Invalid hazard report ID format' });
-        }
+  try {
+const { title, description } = req.body;
 
-        const hazardReport = await HazardReport.findById(hazardReportId).exec();
+if (!title || !description) {
+  return res.status(400).json({ message: "Title and description are required" });
+}
 
-        if (!hazardReport) {
-            return res.status(404).json({ message: 'Hazard Report not found' });
-        }
-        const userId = res.locals.jwt?.id;
-
-        if (!userId) {
-        return res.status(401).json({ message: "Unauthorized" });
-        }
-
-        if (hazardReport.user.toString() !== userId) {
-        return res.status(403).json({ message: "You can only edit your own hazard report." });
-        }
-        const oneHour = 60 * 60 * 1000; 
-
-        const reportWithCreatedAt = hazardReport as unknown as { createdAt: Date };
-        const timeDifference = 
-          Date.now() - new Date(reportWithCreatedAt.createdAt).getTime();
-
-        if (timeDifference > oneHour) {
-            return res.status(403).json({
-                message: 'You can only edit a hazard report within 1 hour of posting it.'
-            });
-        }
-
-        Object.assign(hazardReport, value);
-        await hazardReport.save();
-
-        return res.status(200).json({
-            message: 'Hazard Report updated successfully',
-            hazardReport
-        });
-
-    } catch (error) {
-        console.error('Error updating hazard report:', error);
-        next(error);
+    if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
+      console.log("invalid object id");
+      return res.status(400).json({ message: "Invalid hazard report ID format" });
     }
+
+    const hazardReport = await HazardReport.findById(hazardReportId);
+    console.log("hazardReport from DB:", hazardReport);
+
+    if (!hazardReport) {
+      return res.status(404).json({ message: "Hazard Report not found" });
+    }
+
+    const userId = res.locals.jwt?.id;
+    console.log("logged in userId:", userId);
+    console.log("hazard owner:", hazardReport.user?.toString());
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (hazardReport.user.toString() !== userId) {
+      return res.status(403).json({ message: "You can only edit your own hazard report." });
+    }
+
+    const oneHour = 60 * 60 * 1000;
+    const reportWithCreatedAt = hazardReport as unknown as { createdAt: Date };
+    const timeDifference = Date.now() - new Date(reportWithCreatedAt.createdAt).getTime();
+
+    if (timeDifference > oneHour) {
+      return res.status(403).json({
+        message: "You can only edit a hazard report within 1 hour of posting it."
+      });
+    }
+
+   hazardReport.title = title;
+   hazardReport.description = description;
+   
+    await hazardReport.save();
+
+    return res.status(200).json({
+      message: "Hazard Report updated successfully",
+      hazardReport
+    });
+  } catch (error) {
+    console.error("Error updating hazard report:", error);
+    next(error);
+  }
 };
 
 const getUserHazardCount = async (

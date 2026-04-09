@@ -2,8 +2,6 @@ import Swal from "sweetalert2";
 import React, { useState } from "react";
 import axios from "axios";
 import { apiNewHazardReporter } from "../services/api";
-import SubmitButton from "./SubmitButton";
-
 type HazardFormProps = {
   readonly onSuccess: () => void;
 };
@@ -63,6 +61,10 @@ export default function HazardForm(props: HazardFormProps) {
 
       formData.set("city", city);
       formData.set("country", country);
+      formData.set("location", `${city}, ${country}`);
+
+      formData.delete("longitude");
+      formData.delete("latitude");
 
       await apiNewHazardReporter(formData);
 
@@ -120,6 +122,7 @@ export default function HazardForm(props: HazardFormProps) {
                 name="hazardtype"
                 className="mt-1 block w-full px-3 py-2 mb-4 border text-gray-700 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 defaultValue=""
+                required
               >
                 <option value="" disabled className="text-[#B3B3B3]">
                   select from list
@@ -172,7 +175,6 @@ export default function HazardForm(props: HazardFormProps) {
                 id="images"
                 name="images"
                 className="hidden"
-                required
                 multiple
                 accept="image/*"
               />
@@ -253,7 +255,11 @@ export default function HazardForm(props: HazardFormProps) {
             </div>
           </div>
 
-          <SubmitButton />
+          <button
+           type="submit"
+           className="bg-black text-white px-4 py-2 rounded-md">
+            Submit
+          </button>
         </form>
       </div>
     </div>

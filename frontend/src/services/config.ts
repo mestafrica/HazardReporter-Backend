@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:3001";
+export const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:1338";
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -26,9 +26,9 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 && window.location.pathname !== '/login') {
+    if (error.response?.status === 401 && globalThis.location.pathname !== '/login') {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      globalThis.location.href = "/login";
     }
     return Promise.reject(error);
   }
