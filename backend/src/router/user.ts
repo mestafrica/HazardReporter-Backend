@@ -9,38 +9,26 @@ const router = express.Router();
 router.post("/users/register", upload.single('avatar'), controller.register);
 router.post("/users/login", controller.login);
 router.patch(
-  "/users/",
-  checkAuth,
-  hasPermission("create_user"),
-  upload.single('avatar'),
-  controller.createUser,
+    "/users/",
+    checkAuth,
+    hasPermission("create_user"),
+    upload.single('avatar'),
+    controller.createUser,
 );
 router.patch(
-  "/users/:id",
-  checkAuth,
-  hasPermission("update_user"),
-  upload.single('avatar'),
-  controller.editUser,
+    "/users/:id",
+    checkAuth,
+    hasPermission("update_user"),
+    upload.single('avatar'),
+    controller.editUser,
 );
 router.delete(
-  "/users/:id",
-  checkAuth,
-  hasPermission("delete_user"),
-  controller.deleteUser,
+    "/users/:id",
+    checkAuth,
+    hasPermission("delete_user"),
+    controller.deleteUser,
 );
 router.post("/users/logout", checkAuth, controller.logout);
-router.get(
-  "/users",
-  checkAuth,
-  hasPermission("read_users"),
-  controller.getAllUsers,
-);
-router.get(
-  "/admin/reports",
-  checkAuth,
-  hasPermission("view_reports"),
-  controller.getAllReports,
-);
 
 // Export router
 export default router;
