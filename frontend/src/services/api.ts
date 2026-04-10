@@ -27,6 +27,11 @@ export const apiUpvoteHazard = async (id: string): Promise<AxiosResponse<HazardR
   return apiClient.patch<HazardReport>(`/hazard-report/upvote/${id}`);
 };
 
+// PATCH upvote hazard report by ID
+export const apiUpvoteHazard = async (id: string): Promise<AxiosResponse<HazardReport>> => {
+  return apiClient.patch<HazardReport>(`/hazard-report/upvote/${id}`);
+};
+
 export const apiUpdateHazardReport = async (
   hazardId: string,
   payload: { title: string; description: string }

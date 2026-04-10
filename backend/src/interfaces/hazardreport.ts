@@ -5,9 +5,10 @@ export interface IHazardReport extends Document {
     hazardtype: String;
     description: String;
     images: String[];
-    longitude: String;
-    latitude: String;
+    location: String;
     city: String;
     country: String;
     user: Types.ObjectId;
+    upvotes: number;
+    upvotedBy: Types.ObjectId[];
 }

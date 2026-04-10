@@ -1,77 +1,70 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider,} from "react-router-dom";
 import DashboardLayout from "./layouts/dashBoardLayout";
-import Home from "./components/Home";
-import Events from "./components/Events";
-import Inbox from "./components/Inbox";
-import Broadcasts from "./components/Broadcasts";
-import Settings from "./components/Settings";
-import Sidebar from "./components/SideBar";
-
-
-
-
-
-
-
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import DashboardLayout from "./layouts/dashBoardLayout";
-import Home from "./components/Home";
-import Events from "./components/Events";
-import Inbox from "./components/Inbox";
-import Broadcasts from "./components/Broadcasts";
-import Settings from "./components/Settings";
-import Sidebar from "./components/SideBar";
+import Dashboard from "./pages/Dashboard";
+import ContentModeration from "./pages/ContentModeration";
+import Announcements from "./pages/Announcements";
+import UserManagement from "./pages/UserManagement";
+import Settings from "./pages/Settings";
 import AdminLogin from "./pages/AdminLogin";
+import ErrorPage from "./errorpage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { DashboardProvider } from "./context/DashboardContext";
+import { Toaster } from "react-hot-toast";
+
+
 
 function App() {
     const router = createBrowserRouter([
-        {
-            path: "/sidebar",
-            element: <Sidebar/>
-       },
-       
+      {
+      path: "/admin-login",
+      element: <AdminLogin />,
+    },
        {
         path: "/admin-dashboard",
-        element: <DashboardLayout/>,
+        element: (
+          <ProtectedRoute>
+            <DashboardLayout/>
+          </ProtectedRoute>
+        ),
         children: [
             {
                 index: true,
-                element: <Home />,
-
+                element: <Dashboard />,
             },
             {
-                path: "admin-dashboard/events",
-                element: <Events />,
-
+                path: "moderation",
+                element: <ContentModeration />,
             },
             {
-                path: "admin-dashboard/inbox",
-                element: <Inbox />,
-
+                path: "announcements",
+                element: <Announcements />,
             },
             {
-                path: "admin-dashboard/broadcasts",
-                element: <Broadcasts />,
-
+                path: "users",
+                element: <UserManagement />,
             },
             {
-                path: "admin-dashboard/settings",
+                path: "settings",
                 element: <Settings />,
-
             },
-
-
-            ],
-        }
-        
-       
-
-
-
-
+        ],
+      },
+      {
+          path: "*",
+          element: <ErrorPage />
+      },
+      {
+        path: "/",
+        element: <AdminLogin />
+      }
     ]);
 
-    return <RouterProvider router={router} />;
+    return (
+        <DashboardProvider>
+            <RouterProvider router={router} />
+            <Toaster position="top-right" />
+        </DashboardProvider>
+    );
 };
 
 export default App;
