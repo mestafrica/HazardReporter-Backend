@@ -88,7 +88,7 @@ app.use((req, res, next) => {
 // httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
 
 // Listen for incoming requests
-const port = process.env.PORT || 1337;
+const port = process.env.PORT || 1338;
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });
