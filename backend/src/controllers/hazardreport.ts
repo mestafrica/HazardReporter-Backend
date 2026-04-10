@@ -4,14 +4,7 @@ import HazardReport from "../models/hazardreport";
 import User from "../models/user";
 import { hazardreportValidator } from "../validators/hazardreport";
 import { IHazardReport } from "../interfaces/hazardreport";
-import { NextFunction, Request, Response } from "express";
-import mongoose, { Types } from "mongoose";
-import HazardReport from "../models/hazardreport";
-import User from "../models/user";
-import { hazardreportValidator } from "../validators/hazardreport";
-import { IHazardReport } from "../interfaces/hazardreport";
 
-const NAMESPACE = "HazardReport";
 const NAMESPACE = "HazardReport";
 
 type UploadedFile = {
@@ -70,23 +63,14 @@ const createHazardReport = async (
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-
     const userId = res.locals.jwt?.id;
-    const userId = res.locals.jwt?.id;
+    
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
     }
     const user = await User.findById(userId);
     if (!user) {
@@ -98,24 +82,12 @@ const createHazardReport = async (
       ...value,
       user,
     })) as IHazardReport & { _id: Types.ObjectId };
-    const hazardReport = (await HazardReport.create({
-      ...value,
-      user,
-    })) as IHazardReport & { _id: Types.ObjectId };
+    
 
     // Add the new hazard report's ID to the user's reports array
     user.reports.push(hazardReport._id);
     await user.save();
-    user.reports.push(hazardReport._id);
-    await user.save();
-
-    return res
-      .status(201)
-      .json({ message: "Hazard Report created successfully", hazardReport });
-  } catch (error) {
-    console.error(NAMESPACE, (error as Error).message, error);
-    next(error);
-  }
+   
     return res
       .status(201)
       .json({ message: "Hazard Report created successfully", hazardReport });
@@ -135,26 +107,6 @@ const getAllHazardReports = async (
       "user",
       "firstName lastName userName",
     );
-const getAllHazardReports = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const hazardReports = await HazardReport.find().populate(
-      "user",
-      "firstName lastName userName",
-    );
-
-    return res.status(200).json({
-      message: "All Hazard Reports retrieved successfully",
-      hazardReports,
-      count: hazardReports.length,
-    });
-  } catch (error) {
-    console.error("Error fetching hazard reports:", error);
-    next(error);
-  }
     return res.status(200).json({
       message: "All Hazard Reports retrieved successfully",
       hazardReports,
@@ -172,20 +124,6 @@ const getHazardReportById = async (
   next: NextFunction,
 ) => {
   const hazardReportId = req.params.id;
-const getHazardReportById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const hazardReportId = req.params.id;
-
-  try {
-    // Validate the ID format (assuming it's an ObjectId)
-    if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
-      return res
-        .status(400)
-        .json({ message: "Invalid hazard report ID format" });
-    }
   try {
     // Validate the ID format (assuming it's an ObjectId)
     if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
@@ -196,23 +134,7 @@ const getHazardReportById = async (
 
     // Fetch the hazard report by ID
     const hazardreport = await HazardReport.findById(hazardReportId).exec();
-    // Fetch the hazard report by ID
-    const hazardreport = await HazardReport.findById(hazardReportId).exec();
 
-    if (hazardreport) {
-      return res.status(200).json({
-        message: "Hazard Report found",
-        hazardreport,
-      });
-    } else {
-      return res.status(404).json({
-        message: "Hazard Report not found",
-      });
-    }
-  } catch (error) {
-    console.error("Error fetching hazard report by ID:", error);
-    next(error);
-  }
     if (hazardreport) {
       return res.status(200).json({
         message: "Hazard Report found",
@@ -229,20 +151,6 @@ const getHazardReportById = async (
   }
 };
 
-const updateHazardReport = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const hazardReportId = req.params.id;
-
-  try {
-    // Validate the data to update a hazard report
-    const { error, value } = hazardreportValidator.validate(req.body);
-    if (error) {
-      console.error("Validation Error:", error.details[0].message);
-      return res.status(400).json({ message: error.details[0].message });
-    }
 const updateHazardReport = async (req: Request, res: Response, next: NextFunction) => {
   console.log("UPDATE ROUTE HIT");
 
@@ -341,13 +249,6 @@ const getUserHazardCount = async (
 ) => {
   try {
     const jwtId = res.locals.jwt?.id; // Extract user ID from the JWT
-const getUserHazardCount = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const jwtId = res.locals.jwt?.id; // Extract user ID from the JWT
 
     // Check if the user ID exists in the JWT
     if (!jwtId) {
@@ -355,43 +256,18 @@ const getUserHazardCount = async (
         .status(401)
         .json({ message: "Unauthorized: User ID is missing in JWT" });
     }
-    // Check if the user ID exists in the JWT
-    if (!jwtId) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized: User ID is missing in JWT" });
-    }
-
-    // Validate that the user ID is a valid MongoDB ObjectId
-    if (!mongoose.isValidObjectId(jwtId)) {
-      return res.status(400).json({ message: "Invalid User ID format" });
-    }
     // Validate that the user ID is a valid MongoDB ObjectId
     if (!mongoose.isValidObjectId(jwtId)) {
       return res.status(400).json({ message: "Invalid User ID format" });
     }
 
-    // Convert the user ID to a MongoDB ObjectId
-    const userId = new mongoose.Types.ObjectId(jwtId);
     // Convert the user ID to a MongoDB ObjectId
     const userId = mongoose.Types.ObjectId.createFromHexString(jwtId);
 
     // Fetch the hazard reports associated with the user
     const hazardReports = await HazardReport.find({ user: userId }).exec();
     console.log("Hazard Reports Retrieved:", hazardReports);
-    // Fetch the hazard reports associated with the user
-    const hazardReports = await HazardReport.find({ user: userId }).exec();
-    console.log("Hazard Reports Retrieved:", hazardReports);
 
-    return res.status(200).json({
-      message: "User Hazard Reports retrieved successfully",
-      hazardReports,
-      count: hazardReports.length,
-    });
-  } catch (error) {
-    console.error("Error fetching user hazard reports:", error);
-    next(error);
-  }
     return res.status(200).json({
       message: "User Hazard Reports retrieved successfully",
       hazardReports,
@@ -423,21 +299,11 @@ const deleteHazardReport = async (
         .status(400)
         .json({ message: "Invalid hazard report ID format" });
     }
-  try {
-    // Validate the ID format
-    if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
-      return res
-        .status(400)
-        .json({ message: "Invalid hazard report ID format" });
-    }
 
     // Delete the hazard report
     const deletedHazardReport =
       await HazardReport.findByIdAndDelete(hazardReportId).exec();
-    // Delete the hazard report
-    const deletedHazardReport =
-      await HazardReport.findByIdAndDelete(hazardReportId).exec();
-
+    
     if (deletedHazardReport) {
       return res.status(200).json({
         message: "Hazard Report deleted successfully",
@@ -578,7 +444,7 @@ const getHazardReportStats = async (
     next(error);
   }
 };
-
+}
 // Function for the hazard report statistics endpoint
 const getHazardReportStats = async (
   req: Request,
@@ -754,3 +620,4 @@ export default {
   deleteHazardReport,
   getHazardReportStats,
 };
+}
