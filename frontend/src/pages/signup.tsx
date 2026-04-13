@@ -6,7 +6,6 @@ import { apiSignup } from "../services/auth";
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState<string>("");
-  const [phonenumber, setPhoneNumber] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");

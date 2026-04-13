@@ -5,29 +5,211 @@ import upload from "../middlewares/upload";
 
 const router = express.Router();
 
-// Define user routes
-router.post("/users/register", upload.single('avatar'), controller.register);
+/**
+ * @swagger
+ * /users/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               confirmPassword:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: Invalid input or user already exists
+ */
+router.post("/users/register", upload.single("avatar"), controller.register);
+
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful, returns JWT token
+ *       401:
+ *         description: Invalid credentials
+ */
 router.post("/users/login", controller.login);
+/**
+ * @swagger
+ * /users:
+ *   patch:
+ *     summary: Create a new user (admin only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - insufficient permissions
+ */
 router.patch(
-    "/users/",
-    checkAuth,
-    hasPermission("create_user"),
-    upload.single('avatar'),
-    controller.createUser,
+  "/users/",
+  checkAuth,
+  hasPermission("create_user"),
+  upload.single("avatar"),
+  controller.createUser,
+  "/users/",
+  checkAuth,
+  hasPermission("create_user"),
+  upload.single("avatar"),
+  controller.createUser,
 );
+
+/**
+ * @swagger
+ * /users/{id}:
+ *   patch:
+ *     summary: Update a user (admin only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - insufficient permissions
+ */
 router.patch(
-    "/users/:id",
-    checkAuth,
-    hasPermission("update_user"),
-    upload.single('avatar'),
-    controller.editUser,
+  "/users/:id",
+  checkAuth,
+  hasPermission("update_user"),
+  upload.single("avatar"),
+  controller.editUser,
+  "/users/:id",
+  checkAuth,
+  hasPermission("update_user"),
+  upload.single("avatar"),
+  controller.editUser,
 );
+
+/**
+ * @swagger
+ * /users/{id}:
+ *   delete:
+ *     summary: Delete a user (admin only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - insufficient permissions
+ */
 router.delete(
-    "/users/:id",
-    checkAuth,
-    hasPermission("delete_user"),
-    controller.deleteUser,
+  "/users/:id",
+  checkAuth,
+  hasPermission("delete_user"),
+  controller.deleteUser,
+  "/users/:id",
+  checkAuth,
+  hasPermission("delete_user"),
+  controller.deleteUser,
 );
+
+/**
+ * @swagger
+ * /users/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ *       401:
+ *         description: Unauthorized
+ */
 router.post("/users/logout", checkAuth, controller.logout);
 
 // Export router

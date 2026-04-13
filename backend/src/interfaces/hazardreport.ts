@@ -11,4 +11,6 @@ export interface IHazardReport extends Document {
     user: Types.ObjectId;
     upvotes: number;
     upvotedBy: Types.ObjectId[];
+    createdAt: Date;
+    updatedAt: Date;
 }

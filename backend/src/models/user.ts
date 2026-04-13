@@ -1,4 +1,4 @@
-import IUser from "../interfaces/user";
+import {IUser} from "../interfaces/user";
 // import bcrypt from "bcrypt";
 // import crypto from "crypto";
 import mongoose, { Schema, Types } from "mongoose";

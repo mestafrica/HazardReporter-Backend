@@ -10,4 +10,5 @@ export const apiSignup = async (payload: {
   password: string;
   confirmPassword: string;
   userName: string;
+  phoneNumber:string;
 }) => apiClient.post("/api/users/register", payload);

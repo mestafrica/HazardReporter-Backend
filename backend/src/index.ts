@@ -13,6 +13,8 @@ import hazardReport from "./router/hazardreport";
 import announcementRoutes from "./router/announcement";
 import cors from "cors";
 import "express-async-errors";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger";
 
 const NAMESPACE = "Server";
 const app = express();
@@ -69,6 +71,14 @@ app.use((req, res, next) => {
 
   // Pass to next middleware or route handler
   next();
+});
+
+// Swagger documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { swaggerOptions: { url: "/api-docs.json" } }));
+
+// Root route - redirect to Swagger docs
+app.get("/", (req, res) => {
+  res.redirect("/api-docs");
 });
 
 // Use Route

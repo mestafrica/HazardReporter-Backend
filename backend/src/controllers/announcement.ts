@@ -15,7 +15,7 @@ export const createAnnouncement = async (req: Request, res: Response, next: Next
             format: file.mimetype.split('/')[1]
         })) || [];
 
-        const userId = res.locals.jwt?.id;
+        const userId = req.user?.id;
 
         const announcement = await Announcement.create({
             title,

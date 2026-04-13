@@ -27,7 +27,9 @@ export const apiUpvoteHazard = async (id: string): Promise<AxiosResponse<HazardR
   return apiClient.patch<HazardReport>(`/hazard-report/upvote/${id}`);
 };
 
-// DELETE hazard report by ID
-// export const apiDeleteHazardReportById = async (id: number): Promise<AxiosResponse<void>> => {
-//   return apiClient.delete<void>(`/hazard-report/${id}`);
-// };
+export const apiUpdateHazardReport = async (
+  hazardId: string,
+  payload: { title: string; description: string }
+) => {
+  return apiClient.patch(`/hazard-report/update/${hazardId}`, payload);
+};

@@ -1,7 +1,17 @@
 import express from "express";
 import adminController from "../controllers/admin";
+import adminController from "../controllers/admin";
 import hazardReportController from "../controllers/hazardreport";
 import { checkAuth, hasPermission } from "../middlewares/auth";
+import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
+import {
+    createAnnouncement,
+    getAllAnnouncements,
+    getAnnouncementById,
+    updateAnnouncement,
+    deleteAnnouncement
+} from "../controllers/announcement";
+import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
 import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
 import {
     createAnnouncement,
@@ -25,7 +35,28 @@ router.get(
     checkAuth,
     hasPermission("view_reports"),
     hazardReportController.getAllHazardReports
+    "/admin/reports",
+    checkAuth,
+    hasPermission("view_reports"),
+    hazardReportController.getAllHazardReports
 );
+
+/**
+ * @swagger
+ * /admin/reports/stats:
+ *   get:
+ *     summary: Get hazard report statistics (admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Hazard report statistics
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - insufficient permissions
+ */
 router.get(
     "/admin/reports/stats",
     checkAuth,
@@ -69,6 +100,7 @@ router.get(
     hasPermission("read_users"),
     adminController.getAllUsers
 );
+
 
 
 export default router;
