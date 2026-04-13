@@ -103,11 +103,6 @@ router.patch(
   hasPermission("create_user"),
   upload.single("avatar"),
   controller.createUser,
-  "/users/",
-  checkAuth,
-  hasPermission("create_user"),
-  upload.single("avatar"),
-  controller.createUser,
 );
 
 /**
@@ -155,11 +150,6 @@ router.patch(
   hasPermission("update_user"),
   upload.single("avatar"),
   controller.editUser,
-  "/users/:id",
-  checkAuth,
-  hasPermission("update_user"),
-  upload.single("avatar"),
-  controller.editUser,
 );
 
 /**
@@ -186,10 +176,6 @@ router.patch(
  *         description: Forbidden - insufficient permissions
  */
 router.delete(
-  "/users/:id",
-  checkAuth,
-  hasPermission("delete_user"),
-  controller.deleteUser,
   "/users/:id",
   checkAuth,
   hasPermission("delete_user"),
