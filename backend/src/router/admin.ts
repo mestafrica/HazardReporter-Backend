@@ -1,6 +1,6 @@
 import express from "express";
 import adminController from "../controllers/admin";
-import * as hazardReportController from "../controllers/hazardreport";
+import  hazardReportController from "../controllers/hazardreport";
 import { checkAuth, hasPermission } from "../middlewares/auth";
 import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
 import {
