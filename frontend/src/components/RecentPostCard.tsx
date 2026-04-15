@@ -11,18 +11,24 @@ import { useAuth } from "../context/AuthContext";
 dayjs.extend(relativeTime);
 
 interface RecentPostProps {
-  hazard: HazardReport;
+  readonly hazard: HazardReport;
+  readonly onEdit?: (hazard: HazardReport) => void;
 }
 
 const baseUrl = import.meta.env.VITE_IMAGE_BASE_URL || "";
 
-export default function RecentPostCard({ hazard }: RecentPostProps) {
+export default function RecentPostCard({ hazard, onEdit }: Readonly<RecentPostProps>) {
   const { user } = useAuth();
 
   const [upvotes, setUpvotes] = useState(hazard.upvotes ?? 0);
   const [upvotedBy, setUpvotedBy] = useState<string[]>(hazard.upvotedBy ?? []);
 
   const userId = user?.id;
+
+  const canEdit =
+  !!userId &&
+  hazard.user?._id === userId &&
+  dayjs().diff(dayjs(hazard.createdAt), "hour", true) < 1;
 
   // FIXED REAL TIME TOGGLE CHECK
   const hasUpvoted = userId ? upvotedBy.includes(userId) : false;
@@ -40,18 +46,29 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
 
       // update list of users that have upvoted
       setUpvotedBy(updated.upvotedBy);
-    } catch (err: any) {
-    const backendMsg = err?.response?.data?.message;
-    toast.error(backendMsg || "Upvote failed");
-    console.error("Upvote failed:", err);
-  }
+    }catch (err: unknown) {
+  const backendMsg =
+    err && typeof err === "object" && "response" in err
+      ? (err as {
+          response?: { data?: { message?: string } };
+        }).response?.data?.message
+      : undefined;
+
+  toast.error(backendMsg || "Upvote failed");
+  console.error("Upvote failed:", err);
+}
+  };
+
+  const handleEditClick = () => {
+    if (!canEdit) return;
+    onEdit?.(hazard);
   };
 
   return (
     <>
       <div className="bg-white p-4 border rounded-lg shadow-sm hover:shadow-md transition">
         <div className="flex items-center mb-4">
-          <img className="w-12 h-12 rounded-full mr-3 bg-red-200" />
+          <img alt="" className="w-12 h-12 rounded-full mr-3 bg-red-200" />
           <div>
             <h3 className="text-lg font-semibold text-gray-800">
               {hazard.user?.userName ?? "Anonymous"}
@@ -70,14 +87,21 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
           <div className="flex items-center gap-x-[1rem] overflow-y-hidden">
             {hazard.images && hazard.images.length > 0 ? (
               <div className="flex gap-2">
-                {hazard.images.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={`${baseUrl}/${img}`}
-                    alt={`Hazard ${hazard.title} image ${idx + 1}`}
-                    className="w-full h-48 object-cover rounded-xl mb-4"
-                  />
-                ))}
+                {hazard.images.map((img) => {
+  const imageSrc =
+    img.startsWith("http://") || img.startsWith("https://")
+      ? img
+      : `${baseUrl}/${img}`;
+
+  return (
+    <img
+      key={img}
+      src={imageSrc}
+      alt={`Hazard: ${hazard.title}`}
+      className="w-full h-48 object-cover rounded-xl mb-4"
+    />
+      );
+})}
               </div>
             ) : (
               <div className="w-full h-48 rounded-xl bg-gray-200 items-center justify-center hidden">
@@ -97,10 +121,19 @@ export default function RecentPostCard({ hazard }: RecentPostProps) {
             {`${upvotes} upvotes`}
           </span>
 
+          <div className="flex items-center gap-4">
+           {canEdit && (
+          <button
+           onClick={handleEditClick}
+           className="text-sm text-blue-600 hover:underline">
+           Edit
+          </button> )}
+
           <span className="flex items-center gap-2">
             <CiShare2 /> share
           </span>
         </div>
+      </div>
       </div>
       <ToastContainer />
     </>

@@ -5,9 +5,6 @@ export const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:3001";
 // Create axios instance
 export const apiClient = axios.create({
   baseURL: baseUrl,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // Request interceptor to add token dynamically
@@ -26,9 +23,9 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 && window.location.pathname !== '/login') {
+    if (error.response?.status === 401 && globalThis.location.pathname !== '/login') {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      globalThis.location.href = "/login";
     }
     return Promise.reject(error);
   }

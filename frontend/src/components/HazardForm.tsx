@@ -2,8 +2,10 @@
 
 // import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { apiNewHazardReporter } from "../services/api";
+import { HazardReport } from "../types/hazardreport";
+import { apiNewHazardReporter, apiUpdateHazardReport } from "../services/api";
 import SubmitButton from "./SubmitButton";
+import Autocomplete from "react-google-autocomplete";
 // import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 // import type { LatLngExpression, LeafletMouseEvent } from "leaflet";
 // import "leaflet/dist/leaflet.css";
@@ -14,6 +16,7 @@ import { useState } from "react";
 
 type HazardFormProps = {
   onSuccess: () => void;
+  editingHazard: HazardReport | null;
 };
 
 // 🌍 Sub-component: Select location using OpenStreetMap
@@ -81,8 +84,8 @@ type HazardFormProps = {
 //   );
 // }
 
-// 🌿 Main Hazard Form
-export default function HazardForm({ onSuccess }: HazardFormProps) {
+//  Main Hazard Form
+export default function HazardForm({ onSuccess, editingHazard }: HazardFormProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   // const [location, setLocation] = useState<string>("");
@@ -97,6 +100,13 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
     setTimeout(() => navigate("/login"), 1500);
     return null;
   }
+   const [locationData, setLocationData] = useState({
+    location: editingHazard?.location || "",
+    city: editingHazard?.city || "",
+    country: editingHazard?.country || "",
+    latitude: "",
+    longitude: "",
+  });
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -106,12 +116,19 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
       const formData = new FormData(form);
       // formData.append("location", location);
 
-      await apiNewHazardReporter(formData);
+      if (editingHazard) {
+      await apiUpdateHazardReport(editingHazard._id, {
+      title: formData.get("title")  as string,
+      description: formData.get("description")  as string,
+     });
+} else {
+  await apiNewHazardReporter(formData);
+}
       onSuccess();
 
       Swal.fire({
         icon: "success",
-        title: "Hazard Reported Successfully",
+        title: editingHazard ? "Hazard Updated Successfully" : "Hazard Reported Successfully",
         showConfirmButton: false,
         timer: 1500,
       });
@@ -141,6 +158,7 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
                 type="text"
                 id="title"
                 name="title"
+                defaultValue={editingHazard?.title || ""}
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 required
@@ -157,6 +175,7 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
               <select
                 id="hazardtype"
                 name="hazardtype"
+                defaultValue={editingHazard?.hazardtype || ""}
                 className="mt-1 block w-full px-3 py-2 border text-gray-700 border-gray-300 rounded-md shadow-sm 
                 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 required
@@ -183,6 +202,7 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
               <textarea
                 id="description"
                 name="description"
+                defaultValue={editingHazard?.description || ""}
                 placeholder="Describe the hazard here"
                 className="mt-1 block w-full h-40 sm:h-44 md:h-52
                 px-6 py-4 border border-gray-300 rounded-md shadow-sm 
@@ -222,8 +242,7 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
                 type="file"
                 id="images"
                 name="images"
-                className="hidden"
-                required
+                required={!editingHazard}
                 multiple
                 accept="image/*"
                 onChange={(e) => {
@@ -281,6 +300,7 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
                 type="text"
                 id="country"
                 name="country"
+                defaultValue={editingHazard?.country || ""}
                 className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 required
@@ -298,6 +318,7 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
                 type="text"
                 id="city"
                 name="city"
+                defaultValue={editingHazard?.city || ""}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 required
@@ -314,6 +335,7 @@ export default function HazardForm({ onSuccess }: HazardFormProps) {
                 type="text"
                 id="location"
                 name="location"
+                defaultValue={editingHazard?.location || ""}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 required

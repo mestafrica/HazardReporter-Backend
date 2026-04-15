@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import profilePic from "../assets/images/profile.png";
 import {
   Description,
@@ -10,15 +10,25 @@ import {
 import { ASSETS } from "../assets/assets";
 import HazardForm from "./HazardForm";
 import SubmitButton from "./SubmitButton";
+import { HazardReport } from "../types/hazardreport";
 
 type PostHazzardReportUiProps = {
-  onSuccess: () => void; // 👈 accept callback from parent
+  onSuccess: () => void; 
+  editingHazard: HazardReport | null;
+
 };
 
 const PostHazzardReportUi: React.FC<PostHazzardReportUiProps> = ({
   onSuccess,
+  editingHazard,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (editingHazard) {
+      setIsOpen(true);
+    }
+  }, [editingHazard]);
 
   return (
     <>
@@ -108,11 +118,12 @@ const PostHazzardReportUi: React.FC<PostHazzardReportUiProps> = ({
             {/* Form */}
             <div className="w-full">
               <HazardForm
-                onSuccess={() => {
-                  setIsOpen(false); // Close modal
-                  onSuccess(); // Re-fetch hazards
-                }}
-              />
+               editingHazard={editingHazard}
+               onSuccess={() => {
+               setIsOpen(false); // Close modal
+               onSuccess(); // Re-fetch hazards
+  }}
+/>
             </div>
           </DialogPanel>
         </div>

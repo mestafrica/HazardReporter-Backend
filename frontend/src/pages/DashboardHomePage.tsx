@@ -19,6 +19,7 @@ const { user } = useAuth();
 
   const [hazards, setHazards] = useState<HazardReport[]>([]);
   const [trendinghazards, setTrendingHazards] = useState<HazardReport[]>([]);
+  const [editingHazard, setEditingHazard] = useState<HazardReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +30,12 @@ const { user } = useAuth();
       const response = (await apiGetAllHazardReports()) as unknown as {
         data: HazardResponse;
       };
-      setHazards(response.data.hazardReports || []);
+      const sortedHazards = (response.data.hazardReports || []).sort(
+      (a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+     );
+    setHazards(sortedHazards);
+
     } catch (err) {
       console.error("Error fetching hazards:", err);
       setError("Failed to load hazard reports. Please try again.");
@@ -82,17 +88,20 @@ const { user } = useAuth();
       </div>
     );
   }
+  const handleEditHazard = (hazard: HazardReport) => {
+   setEditingHazard(hazard);
+};
 
   return (
-    <>
+  
       <div className="container space-y-10">
         <div className="w-[95%] mx-auto">
           <div className="flex gap-x-4 my-4 md:my-6 ">
 
-            {/* 🔥 CONDITIONAL UI HERE */}
+            {/*  CONDITIONAL UI HERE */}
             <div className=" bg-white rounded-md md:w-2/3 w-full md:h-[200px] shadow-sm  ">
               {user ? (
-                <PostHazzardReportUi onSuccess={fetchHazards} />
+                <PostHazzardReportUi  onSuccess={() => {fetchHazards(); setEditingHazard(null); }} editingHazard={editingHazard}/>
               ) : (
                 <div className="bg-[url('./assets/images/clean-dirty-environment.png')] bg-cover bg-center bg-no-repeat rounded-lg shadow-md md:h-[200px]">
                 <div className="p-6 text-center bg-black/20 rounded-lg backdrop-brightness-75 md:h-[200px] flex flex-col justify-center items-center">
@@ -152,17 +161,20 @@ const { user } = useAuth();
                 <h2 className="text-xl font-bold text-gray-800">Recent Post</h2>
                 <a
                   href="#!"
-                  className="text-blue-600 font-medium hover:underline"
-                >
+                  className="text-blue-600 font-medium hover:underline" >
                   View all
                 </a>
               </div>
 
               <div className="grid grid-cols-1 gap-6">
                 {hazards.length > 0 ? (
-                  hazards.map((hazard) => (
-                    <RecentPostCard key={hazard._id} hazard={hazard} />
-                  ))
+                  hazards.map((hazard: HazardReport) => (
+                  <RecentPostCard
+                  key={hazard._id}
+                  hazard={hazard}
+                  onEdit={handleEditHazard}
+                   />
+                ))
                 ) : (
                   <div className="text-center py-12 bg-gray-50 rounded-lg">
                     <p className="text-gray-500 mb-4">No hazard reports found</p>
@@ -216,6 +228,5 @@ const { user } = useAuth();
           </div>
         </div>
       </div>
-    </>
   );
 }
