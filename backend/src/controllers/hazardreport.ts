@@ -24,10 +24,9 @@ const createHazardReport = async (
   try {
     const { error, value } = hazardreportValidator.validate({
       ...req.body,
-      images:
-        (req.files as Express.Multer.File[] | undefined)
-          ?.filter((file) => file && (file as any).path)
-          ?.map((file) => (file as any).path) || [],
+      images: ((req.files as Express.Multer.File[] | undefined) || []).map(
+        (file) => file.path
+      ),
     });
   
   if (error) {
@@ -36,9 +35,6 @@ const createHazardReport = async (
     const userId = req.user?.id;
     
 
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -66,35 +62,6 @@ const createHazardReport = async (
     next(error);
   }
 };
-
-// const isUploadedFile = (file: unknown): file is UploadedFile => {
-  //   return (
-  //   typeof file === "object" &&
-  //   file !== null &&
-  //   "filename" in file &&
-  //   typeof (file as { filename?: unknown }).filename === "string" &&
-  //   "path" in file &&
-  //   typeof (file as { path?: unknown }).path === "string"
-  // );
-
-// const createHazardReport = async (
-  // req: RequestWithFiles,
-  // res: Response,
-  // next: NextFunction,
-// ) => {
-//   try {
-//     console.log("req.files:", req.files);
-//     console.log("req.body before processing:", req.body);
-
-//     const rawFiles = Array.isArray(req.files) ? req.files : [];
-//     const imageNames = rawFiles.filter(isUploadedFile).map((file) => file.filename);
-
-//     const { error, value } = hazardreportValidator.validate({
-//       ...req.body,
-//       images: imageNames,
-//     });
-
-    
 
 const getAllHazardReports = async (
   req: Request,
@@ -432,13 +399,66 @@ const updateReportStatus = async (
   }
 };
 
+const upvoteHazardReport = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid hazard report ID format" });
+    }
+
+    const hazardReport = await HazardReport.findById(id);
+
+    if (!hazardReport) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    // Check if user already upvoted
+    const alreadyUpvoted = (hazardReport.upvotedBy || []).some(
+      (user) => user.toString() === userId
+    );
+
+    if (alreadyUpvoted) {
+      return res.status(400).json({
+        message: "You have already upvoted this report",
+      });
+    }
+
+    hazardReport.upvotedBy = hazardReport.upvotedBy || [];
+    hazardReport.upvotedBy.push(userId);
+
+    hazardReport.upvotes = (hazardReport.upvotes || 0) + 1;
+
+    await hazardReport.save();
+
+    return res.status(200).json({
+      message: "Upvoted successfully",
+      hazardReport,
+    });
+  } catch (error) {
+    console.error("Error upvoting hazard report:", error);
+    next(error);
+  }
+};
+
 export default {
   createHazardReport,
-  updateHazardReport,
-  getHazardReportById,
-  getAllHazardReports,
   getUserHazardCount,
   deleteHazardReport,
+  getAllHazardReports,
+  getHazardReportById,
+  updateHazardReport,
   getHazardReportStats,
+  upvoteHazardReport,
   updateReportStatus,
 };
+
