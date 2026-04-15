@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import IUser from "../interfaces/user"; // Import IUser interface
+import { IUser } from "../interfaces/user"; // Import IUser interface
 
 // Define schema for authentication
 const AuthenticationSchema = new Schema({

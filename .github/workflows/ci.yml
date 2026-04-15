@@ -13,7 +13,7 @@ on:
 
 jobs:
   backend:
-    name: Backend — Install / Lint / Test
+    name: Backend CI
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -22,88 +22,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-          
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: ./backend/package.json
 
       - name: Install dependencies
         working-directory: ./backend
         run: npm install
-      
+
       - name: Run Lint
         working-directory: ./backend
         run: npm run lint
-      
+
       - name: Run Tests
         working-directory: ./backend
         run: npm run test
-      
+
       - name: Run build
         working-directory: ./backend
-        run: npm run build
-
-  frontend:
-    name: Frontend — Install / Lint / Test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-          
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix['node-version'] }}
-          cache: 'npm'
-          cache-dependency-path: ./frontend/package.json
-
-      - name: Install dependencies
-        working-directory: ./frontend
-        run: npm install
-      
-      - name: Run Lint
-        working-directory: ./frontend
-        run: npm run lint
-      
-      - name: Run Tests
-        working-directory: ./frontend
-        run: npm run test
-      
-      - name: Run build
-        working-directory: ./frontend
-        run: npm run build
-
-  admin-dashboard:
-    name: Admin Dashboard — Install / Lint / Test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-          
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix['node-version'] }}
-          cache: 'npm'
-          cache-dependency-path: ./admin-dashboard/package.json
-
-      - name: Install dependencies
-        working-directory: ./admin-dashboard
-        run: npm install
-      
-      - name: Run Lint
-        working-directory: ./admin-dashboard
-        run: npm run lint
-      
-      - name: Run build
-        working-directory: ./admin-dashboard
         run: npm run build

@@ -1,25 +1,25 @@
 # 🌍 HazardWatch
 
 **HazardWatch** is a platform for **tracking and reporting environmental hazards** across Ghana.  
-Enabling communities, authorities, and organizations to stay updated on incidents nationwide.  
+Enabling communities, authorities, and organizations to stay updated on incidents nationwide.
 
 ---
 
 ## 📌 Resources
 
-- 🎨 **Figma Design**: [View on Figma](https://www.figma.com/design/0bLAmyRfjGEnX46mOAlq4G/Ghana-Hazard-Report?node-id=22-175)  
+- 🎨 **Figma Design**: [View on Figma](https://www.figma.com/design/0bLAmyRfjGEnX46mOAlq4G/Ghana-Hazard-Report?node-id=22-175)
 - 📖 **API Documentation (Swagger)**: Available at `http://localhost/api-docs` (run backend locally)
-- 📖 **Legacy API Documentation (Postman)**: [View Documentation](https://documenter.getpostman.com/view/38771706/2sAY518ziL)  
+- 📖 **Legacy API Documentation (Postman)**: [View Documentation](https://documenter.getpostman.com/view/38771706/2sAY518ziL)
 - 🌍 **Live URL**: [ghana-hazard-reporter.vercel.app](https://ghana-hazard-reporter.vercel.app/)
 
 ---
 
 ## 🚀 Project Goals
 
-- Provide a **digital platform for real-time hazard reporting**.  
-- Allow citizens to **report, track, and visualize environmental hazards**.  
-- Support authorities and NGOs in **making informed, data-driven interventions**.  
-- Create a **centralized, accessible hazard awareness hub** for Ghana.  
+- Provide a **digital platform for real-time hazard reporting**.
+- Allow citizens to **report, track, and visualize environmental hazards**.
+- Support authorities and NGOs in **making informed, data-driven interventions**.
+- Create a **centralized, accessible hazard awareness hub** for Ghana.
 
 ---
 
@@ -35,7 +35,7 @@ Enabling communities, authorities, and organizations to stay updated on incident
 
 ## 📁 Project Structure
 
-```
+```text
 HazardWatch/
 ├── backend/              # Express.js API server
 │   ├── src/
@@ -68,6 +68,7 @@ HazardWatch/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18.x or higher
 - npm or yarn
 - MongoDB (local or cloud)
@@ -76,16 +77,18 @@ HazardWatch/
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/mestafrica/HazardWatch.git
    cd HazardWatch
    ```
 
 2. **Configure environment variables**
-   
+
    Create `.env` files for each service:
-   
+
    **Backend** (`.backend/.env`):
+
    ```
    MONGO_URL=your_mongo_URI
    JWT_SECRET=your_jwt_secret_key
@@ -99,6 +102,7 @@ HazardWatch/
 3. **Install dependencies and start services**
 
    **Backend**:
+
    ```bash
    cd backend
    npm install
@@ -108,6 +112,7 @@ HazardWatch/
    ```
 
    **Frontend**:
+
    ```bash
    cd frontend
    npm install
@@ -115,6 +120,7 @@ HazardWatch/
    ```
 
    **Admin Dashboard**:
+
    ```bash
    cd admin-dashboard
    npm install
@@ -126,6 +132,7 @@ HazardWatch/
 ## 🔄 CI/CD Pipeline
 
 **Before pushing**, run locally:
+
 ```bash
 # Backend
 cd backend && npm run lint && npm run test && npm run build
@@ -144,18 +151,21 @@ cd admin-dashboard && npm run lint && npm run build
 We welcome contributions! Here's how to get started:
 
 ### 1. Fork & Branch
+
 ```bash
 git fork https://github.com/mestafrica/HazardWatch.git
 git checkout -b feature/your-feature-name
 ```
 
 ### 2. Make Changes
+
 - Follow the code structure outlined above
 - Use **TypeScript** for type safety
 - Add JSDoc comments for public functions
 - Update Swagger docs for new API endpoints
 
 ### 3. Test Locally
+
 ```bash
 # Test all three services
 cd backend && npm run lint && npm run test && npm run build
@@ -164,6 +174,7 @@ cd ../admin-dashboard && npm run lint && npm run build
 ```
 
 ### 4. Commit & Push
+
 ```bash
 git add .
 git commit -m "feat: clear description of what changed"
@@ -171,12 +182,25 @@ git push origin feature/your-feature-name
 ```
 
 ### 5. Create Pull Request
+
+- Target the `dev` branch for features
+- Include a clear description of changes
+- Wait for CI/CD checks to pass
+- Request review from maintainers
+
+```bash
+
+git commit -m "feat: clear description of what changed"
+git push origin feature/your-feature-name
+```
+
 - Target the `dev` branch for features
 - Include a clear description of changes
 - Wait for CI/CD checks to pass
 - Request review from maintainers
 
 ### Code Standards
+
 - Use **consistent naming**: `camelCase` for variables, `PascalCase` for classes/components
 - Keep functions **under 50 lines** (split large functions)
 - Add **error handling** for all async operations

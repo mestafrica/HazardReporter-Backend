@@ -1,20 +1,19 @@
-import dotenv from "dotenv";
-dotenv.config();
-import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
-import mongoose from "mongoose";
-import logging from "./config/logging";
-import config from "./config/config";
-import userRoutes from "./router/user";
-import adminRoutes from "./router/admin";
-import resetPasswordRoutes from "./router/resetpassword";
-import hazardRoutes from "./router/hazardtypes";
-import hazardReport from "./router/hazardreport";
-import announcementRoutes from "./router/announcement";
 import cors from "cors";
+import dotenv from "dotenv";
+import express, { NextFunction, Request, Response } from "express";
 import "express-async-errors";
+import mongoose from "mongoose";
 import swaggerUi from "swagger-ui-express";
+import config from "./config/config";
+import logging from "./config/logging";
 import { swaggerSpec } from "./config/swagger";
+import adminRoutes from "./router/admin";
+import hazardReport from "./router/hazardreport";
+import hazardRoutes from "./router/hazardtypes";
+import resetPasswordRoutes from "./router/resetpassword";
+import userRoutes from "./router/user";
+dotenv.config();
 
 const NAMESPACE = "Server";
 const app = express();
@@ -131,3 +130,5 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     message: error.message,
   });
 });
+
+export default app;
