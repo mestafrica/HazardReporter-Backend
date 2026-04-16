@@ -8,8 +8,10 @@ import swaggerUi from "swagger-ui-express";
 import config from "./config/config";
 import logging from "./config/logging";
 import { swaggerSpec } from "./config/swagger";
+import announcementRoutes from "./router/announcement";
 import adminRoutes from "./router/admin";
 import hazardReport from "./router/hazardreport";
+import airQualityRoutes from "./router/airquality";
 import hazardRoutes from "./router/hazardtypes";
 import resetPasswordRoutes from "./router/resetpassword";
 import userRoutes from "./router/user";
@@ -87,8 +89,8 @@ app.use("/api", adminRoutes);
 app.use("/hazard", hazardRoutes);
 app.use("/hazard-report", hazardReport);
 app.use("/api", resetPasswordRoutes);
-// app.use("/announcement", announcementRoutes);
-
+app.use("/announcement", announcementRoutes);
+app.use("/air-quality", airQualityRoutes);
 // Error handling for not found routes
 app.use((req, res, next) => {
   const error = new Error("Not found");
@@ -97,19 +99,15 @@ app.use((req, res, next) => {
   });
 });
 
-// const httpServer = http.createServer(router);
-
-// httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
-
 // Listen for incoming requests
-let port = Number(config.server.port) || 1337;
+const port = Number(config.server.port) || 1337;
 
 const startServer = (currentPort: number) => {
   const server = app.listen(currentPort, () => {
     console.log(`App listening on port ${currentPort}`);
   });
 
-  server.on("error", (err: any) => {
+  server.on("error", (err: NodeJS.ErrnoException) => {
     if (err.code === "EADDRINUSE") {
       console.log(
         `Port ${currentPort} is already in use. Trying port ${currentPort + 1}...`,
