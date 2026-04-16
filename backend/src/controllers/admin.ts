@@ -27,7 +27,7 @@ const adminSignup = async (req: Request, res: Response, next: NextFunction) => {
     if (error) {
         return res.status(422).json(error);
     }
-
+     
     const { userName, phoneNumber, email, password, confirmPassword } = value;
 
     if (password !== confirmPassword) {
