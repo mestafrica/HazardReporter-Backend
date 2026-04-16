@@ -73,7 +73,11 @@ app.use((req, res, next) => {
 });
 
 // Swagger documentation
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { swaggerOptions: { url: "/api-docs.json" } }));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, { swaggerOptions: { url: "/api-docs.json" } }),
+);
 
 // Root route - redirect to Swagger docs
 app.get("/", (req, res) => {
@@ -84,25 +88,21 @@ app.get("/", (req, res) => {
 
 app.use("/api", userRoutes);
 app.use("/api", adminRoutes);
-app.use("/hazard", hazardRoutes);
-app.use("/hazard-report", hazardReport);
+app.use("/admin/hazard", hazardRoutes);
+app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
 // app.use("/announcement", announcementRoutes);
 
 // Error handling for not found routes
-app.use((req, res, next) => {
+app.use((req, res) => {
   const error = new Error("Not found");
   res.status(404).json({
     message: error.message,
   });
 });
 
-// const httpServer = http.createServer(router);
-
-// httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
-
 // Listen for incoming requests
-let port = Number(config.server.port) || 1337;
+const port = Number(config.server.port) || 1337;
 
 const startServer = (currentPort: number) => {
   const server = app.listen(currentPort, () => {
