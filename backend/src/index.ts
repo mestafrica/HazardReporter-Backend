@@ -13,6 +13,7 @@ import hazardReport from "./router/hazardreport";
 import hazardRoutes from "./router/hazardtypes";
 import resetPasswordRoutes from "./router/resetpassword";
 import userRoutes from "./router/user";
+import commentRoutes from "./router/comment";
 dotenv.config();
 
 const NAMESPACE = "Server";
@@ -73,7 +74,11 @@ app.use((req, res, next) => {
 });
 
 // Swagger documentation
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { swaggerOptions: { url: "/api-docs.json" } }));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, { swaggerOptions: { url: "/api-docs.json" } }),
+);
 
 // Root route - redirect to Swagger docs
 app.get("/", (req, res) => {
@@ -87,6 +92,7 @@ app.use("/api", adminRoutes);
 app.use("/hazard", hazardRoutes);
 app.use("/hazard-report", hazardReport);
 app.use("/api", resetPasswordRoutes);
+app.use("/comments", commentRoutes);
 // app.use("/announcement", announcementRoutes);
 
 // Error handling for not found routes
