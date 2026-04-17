@@ -1,6 +1,6 @@
 import { Document, Types } from "mongoose";
 
-export interface IUser extends Document {
+export default interface IUser extends Document {
   _id: Types.ObjectId;
   userName: string;
   email?: string;
@@ -15,6 +15,8 @@ export interface IUser extends Document {
   passwordResetToken?: string;
   passwordResetTokenExpires?: Date;
 }
+
+export type { IUser };
 
 export interface IReport extends Document {
   userId: Types.ObjectId;
