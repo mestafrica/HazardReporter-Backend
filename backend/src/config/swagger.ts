@@ -13,12 +13,12 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:1337',
-        description: 'Development server',
+        url: 'http://localhost:3001',
+        description: 'Local development server',
       },
       {
-        url: process.env.API_URL || 'http://localhost:1337',
-        description: 'Production server',
+        url: 'https://hazardreport-backend.onrender.com',
+        description: 'Production server (Render)',
       },
     ],
     tags: [
