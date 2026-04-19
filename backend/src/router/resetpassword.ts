@@ -1,5 +1,6 @@
 import express from "express";
 import controller from "../controllers/auth";
+import upload from "../middlewares/upload";
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ const router = express.Router();
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -24,7 +25,7 @@ const router = express.Router();
  *       404:
  *         description: User not found
  */
-router.post("/forgot-password", controller.forgotPassword);
+router.post("/forgot-password", upload.none(), controller.forgotPassword);
 
 /**
  * @swagger
@@ -56,7 +57,7 @@ router.get("/reset-token/:id", controller.verifyResetToken);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -72,6 +73,6 @@ router.get("/reset-token/:id", controller.verifyResetToken);
  *       400:
  *         description: Invalid input or token expired
  */
-router.post("/reset-password", controller.resetPassword);
+router.post("/reset-password", upload.none(), controller.resetPassword);
 
 export default router;

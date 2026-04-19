@@ -11,6 +11,7 @@ import {
     deleteAnnouncement
 } from "../controllers/announcement";
 import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
+import upload from "../middlewares/upload";
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ const router = express.Router();
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -37,7 +38,7 @@ const router = express.Router();
  *       400:
  *         description: Invalid input
  */
-router.post("/admin/signup", adminController.adminSignup);
+router.post("/admin/signup", upload.none(), adminController.adminSignup);
 
 /**
  * @swagger
@@ -48,7 +49,7 @@ router.post("/admin/signup", adminController.adminSignup);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -62,7 +63,7 @@ router.post("/admin/signup", adminController.adminSignup);
  *       401:
  *         description: Invalid credentials
  */
-router.post("/admin/signin", adminController.adminSignin);
+router.post("/admin/signin", upload.none(), adminController.adminSignin);
 
 /**
  * @swagger

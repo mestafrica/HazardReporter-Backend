@@ -48,7 +48,7 @@ router.post("/users/register", upload.single('avatar'), controller.register);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -62,7 +62,7 @@ router.post("/users/register", upload.single('avatar'), controller.register);
  *       401:
  *         description: Invalid credentials
  */
-router.post("/users/login", controller.login);
+router.post("/users/login", upload.none(), controller.login);
 /**
  * @swagger
  * /users:
