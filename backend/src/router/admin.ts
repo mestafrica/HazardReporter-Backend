@@ -269,6 +269,11 @@ router.get("/admin/announcements/:id", getAnnouncementById);
  *                 type: string
  *               location:
  *                 type: string
+ *               attachments:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
  *     responses:
  *       200:
  *         description: Announcement updated
