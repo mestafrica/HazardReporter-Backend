@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 import swaggerUi from "swagger-ui-express";
 import config from "./config/config";
 import logging from "./config/logging";
-import { swaggerSpec } from "./config/swagger";
+import { swaggerSpec, getSwaggerSpec } from "./config/swagger";
 import adminRoutes from "./router/admin";
 import hazardReport from "./router/hazardreport";
 import hazardRoutes from "./router/hazardtypes";
@@ -69,7 +69,12 @@ app.use(cors({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Swagger documentation
+// Swagger documentation - serve dynamic spec based on request host
+app.get("/api-docs.json", (req: Request, res: Response) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(getSwaggerSpec(req));
+});
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { swaggerOptions: { url: "/api-docs.json" } }));
 
 // Root route - redirect to Swagger docs

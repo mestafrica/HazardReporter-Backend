@@ -1,6 +1,7 @@
 import swaggerJsdoc from 'swagger-jsdoc';
+import { Request } from 'express';
 
-const options = {
+const baseOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
@@ -13,12 +14,8 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3001',
-        description: 'Local development server',
-      },
-      {
-        url: 'https://hazardreport-backend.onrender.com',
-        description: 'Production server (Render)',
+        url: '/',
+        description: 'Current server',
       },
     ],
     tags: [
@@ -61,4 +58,26 @@ const options = {
   apis: ['./src/router/*.ts'],
 };
 
-export const swaggerSpec = swaggerJsdoc(options);
+export const swaggerSpec = swaggerJsdoc(baseOptions);
+
+// Generate swagger spec with dynamic server URL based on request
+export const getSwaggerSpec = (req: Request) => {
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  const serverUrl = `${protocol}://${host}`;
+
+  const dynamicOptions = {
+    ...baseOptions,
+    definition: {
+      ...baseOptions.definition,
+      servers: [
+        {
+          url: serverUrl,
+          description: 'Current server',
+        },
+      ],
+    },
+  };
+
+  return swaggerJsdoc(dynamicOptions);
+};
