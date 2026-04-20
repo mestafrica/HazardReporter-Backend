@@ -1,12 +1,12 @@
 import express from "express";
 import controller from "../controllers/hazardtypes";
-import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
+import { checkAdmin, extractJWT } from "../middlewares/extractJWT";
 
 const router = express.Router();
 
 /**
  * @swagger
- * /hazard/create:
+ * /admin/hazard/create:
  *   post:
  *     summary: Create a new hazard type (admin only)
  *     tags: [Hazard Types]
@@ -35,7 +35,7 @@ router.post("/create", extractJWT, checkAdmin, controller.createHazardType);
 
 /**
  * @swagger
- * /hazard/update/{id}:
+ * /admin/hazard/update/{id}:
  *   patch:
  *     summary: Update hazard type (admin only)
  *     tags: [Hazard Types]
@@ -76,7 +76,7 @@ router.patch(
 
 /**
  * @swagger
- * /hazard/delete/{id}:
+ * /admin/hazard/delete/{id}:
  *   delete:
  *     summary: Delete hazard type (admin only)
  *     tags: [Hazard Types]
@@ -106,7 +106,7 @@ router.delete(
 
 /**
  * @swagger
- * /hazard/all:
+ * /admin/hazard/all:
  *   get:
  *     summary: Get all hazard types
  *     tags: [Hazard Types]
@@ -118,7 +118,7 @@ router.get("/all", controller.getAllHazardTypes);
 
 /**
  * @swagger
- * /hazard/{id}:
+ * /admin/hazard/{id}:
  *   get:
  *     summary: Get hazard type by ID
  *     tags: [Hazard Types]

@@ -13,6 +13,7 @@ import hazardReport from "./router/hazardreport";
 import hazardRoutes from "./router/hazardtypes";
 import resetPasswordRoutes from "./router/resetpassword";
 import userRoutes from "./router/user";
+import announcementRoutes from "./router/announcement";
 dotenv.config();
 
 const NAMESPACE = "Server";
@@ -91,7 +92,7 @@ app.use("/api", adminRoutes);
 app.use("/admin/hazard", hazardRoutes);
 app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
-// app.use("/announcement", announcementRoutes);
+app.use("/announcement", announcementRoutes);
 
 // Error handling for not found routes
 app.use((req, res) => {

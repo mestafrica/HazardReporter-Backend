@@ -1,14 +1,14 @@
-import express from 'express';
-import { extractJWT, checkAdmin } from '../middlewares/extractJWT';
-import { uploadAnnouncementFiles } from '../middlewares/cloudinaryUpload';
+import express from "express";
+import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
+import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
 import {
-    createAnnouncement,
-    getAllAnnouncements,
-    getAnnouncementById,
-    updateAnnouncement,
-    deleteAnnouncement,
-    deleteAnnouncementAttachment
-} from '../controllers/announcement';
+  createAnnouncement,
+  getAllAnnouncements,
+  getAnnouncementById,
+  updateAnnouncement,
+  deleteAnnouncement,
+  deleteAnnouncementAttachment,
+} from "../controllers/announcement";
 
 const router = express.Router();
 
@@ -46,7 +46,13 @@ const router = express.Router();
  *       403:
  *         description: Forbidden - not admin
  */
-router.post('/create', extractJWT, checkAdmin, uploadAnnouncementFiles.array('attachments', 5), createAnnouncement);
+router.post(
+  "/create",
+  extractJWT,
+  checkAdmin,
+  uploadAnnouncementFiles.array("attachments", 5),
+  createAnnouncement,
+);
 
 /**
  * @swagger
@@ -58,7 +64,7 @@ router.post('/create', extractJWT, checkAdmin, uploadAnnouncementFiles.array('at
  *       200:
  *         description: List of all announcements
  */
-router.get('/getall', getAllAnnouncements);
+router.get("/getall", getAllAnnouncements);
 
 /**
  * @swagger
@@ -79,7 +85,7 @@ router.get('/getall', getAllAnnouncements);
  *       404:
  *         description: Announcement not found
  */
-router.get('/getid/:id', getAnnouncementById);
+router.get("/getid/:id", getAnnouncementById);
 
 /**
  * @swagger
@@ -119,7 +125,13 @@ router.get('/getid/:id', getAnnouncementById);
  *       403:
  *         description: Forbidden - not admin
  */
-router.patch('/update/:id', extractJWT, checkAdmin, uploadAnnouncementFiles.array('attachments', 5), updateAnnouncement);
+router.patch(
+  "/update/:id",
+  extractJWT,
+  checkAdmin,
+  uploadAnnouncementFiles.array("attachments", 5),
+  updateAnnouncement,
+);
 
 /**
  * @swagger
@@ -144,7 +156,7 @@ router.patch('/update/:id', extractJWT, checkAdmin, uploadAnnouncementFiles.arra
  *       403:
  *         description: Forbidden - not admin
  */
-router.delete('/delete/:id', extractJWT, checkAdmin, deleteAnnouncement);
+router.delete("/delete/:id", extractJWT, checkAdmin, deleteAnnouncement);
 
 /**
  * @swagger
@@ -175,6 +187,11 @@ router.delete('/delete/:id', extractJWT, checkAdmin, deleteAnnouncement);
  *       403:
  *         description: Forbidden - not admin
  */
-router.delete('/attachment/:id/:attachmentId', extractJWT, checkAdmin, deleteAnnouncementAttachment);
+router.delete(
+  "/attachment/:id/:attachmentId",
+  extractJWT,
+  checkAdmin,
+  deleteAnnouncementAttachment,
+);
 
-export = router;
+export default router;

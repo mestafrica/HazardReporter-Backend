@@ -1,13 +1,13 @@
 import express from "express";
 import controller from "../controllers/hazardreport";
-import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
+import { checkAdmin, extractJWT } from "../middlewares/extractJWT";
 import upload from "../middlewares/upload";
 
 const router = express.Router();
 
 /**
  * @swagger
- * /hazard-report/create:
+ * /hazard/create:
  *   post:
  *     summary: Create a new hazard report
  *     tags: [Hazard Reports]
@@ -55,7 +55,7 @@ router.post(
 
 /**
  * @swagger
- * /hazard-report/user-reports:
+ * /hazard/user-reports:
  *   get:
  *     summary: Get all hazard reports for the authenticated user
  *     tags: [Hazard Reports]
@@ -71,7 +71,7 @@ router.get("/user-reports", extractJWT, controller.getUserHazardCount);
 
 /**
  * @swagger
- * /hazard-report/update/{id}:
+ * /hazard/update/{id}:
  *   patch:
  *     summary: Update a hazard report (owner only, within 1 hour)
  *     tags: [Hazard Reports]
@@ -105,14 +105,10 @@ router.get("/user-reports", extractJWT, controller.getUserHazardCount);
  *       404:
  *         description: Hazard report not found
  */
-router.patch(
-  "/update/:id",
-  extractJWT,
-  controller.updateHazardReport,
-);
+router.patch("/update/:id", extractJWT, controller.updateHazardReport);
 /**
  * @swagger
- * /hazard-report/delete/{id}:
+ * /hazard/delete/{id}:
  *   delete:
  *     summary: Delete a hazard report
  *     tags: [Hazard Reports]
@@ -144,7 +140,7 @@ router.delete(
 
 /**
  * @swagger
- * /hazard-report/getall:
+ * /hazard/getall:
  *   get:
  *     summary: Get all hazard reports
  *     tags: [Hazard Reports]
@@ -158,7 +154,7 @@ router.get("/getall", controller.getAllHazardReports);
 
 /**
  * @swagger
- * /hazard-report/getid/{id}:
+ * /hazard/getid/{id}:
  *   get:
  *     summary: Get a hazard report by ID
  *     tags: [Hazard Reports]
@@ -177,6 +173,6 @@ router.get("/getall", controller.getAllHazardReports);
  */
 router.get("/getid/:id", controller.getHazardReportById);
 
-router.patch('/upvote/:id', extractJWT, controller.upvoteHazardReport);
+router.patch("/upvote/:id", extractJWT, controller.upvoteHazardReport);
 
 export default router;
