@@ -9,6 +9,7 @@ import config from "./config/config";
 import logging from "./config/logging";
 import { swaggerSpec } from "./config/swagger";
 import adminRoutes from "./router/admin";
+import announcementRoutes from "./router/announcement";
 import hazardReport from "./router/hazardreport";
 import hazardRoutes from "./router/hazardtypes";
 import resetPasswordRoutes from "./router/resetpassword";
@@ -91,7 +92,7 @@ app.use("/api", adminRoutes);
 app.use("/admin/hazard", hazardRoutes);
 app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
-// app.use("/announcement", announcementRoutes);
+app.use("/announcement", announcementRoutes);
 
 // Error handling for not found routes
 app.use((req, res) => {
