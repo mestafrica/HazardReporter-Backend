@@ -1,5 +1,6 @@
 import express from "express";
 import adminController from "../controllers/admin";
+<<<<<<< HEAD
 import  hazardReportController from "../controllers/hazardreport";
 import { checkAuth, hasPermission } from "../middlewares/auth";
 import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
@@ -9,13 +10,81 @@ import {
   getAnnouncementById,
   updateAnnouncement,
   deleteAnnouncement,
+=======
+import {
+    createAnnouncement,
+    deleteAnnouncement,
+    getAllAnnouncements,
+    getAnnouncementById,
+    updateAnnouncement,
+>>>>>>> 50a48e8e26852eef2f8988b343ccdf0c495bdbef
 } from "../controllers/announcement";
+import hazardReportController from "../controllers/hazardreport";
+import { checkAuth, hasPermission } from "../middlewares/auth";
 import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
+import { checkAdmin, extractJWT } from "../middlewares/extractJWT";
 
 const router = express.Router();
 
+<<<<<<< HEAD
 // ─── Admin Auth Routes (public) ───────────────────────────────────────────────
 router.post("/admin/signup", adminController.adminSignup);
+=======
+/**
+ * @swagger
+ * /admin/signup:
+ *   post:
+ *     summary: Admin sign up
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *              type: object
+ *             properties:
+ *               userName:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *              confirmPassword:
+ *                type: string
+ *     responses:
+ *       201:
+ *         description: Admin signup successful
+ *       400:
+ *         description: Invalid input
+ */
+router.post("/admin/signup", adminController.adminSignup);
+
+/**
+ * @swagger
+ * /admin/signin:
+ *   post:
+ *     summary: Admin sign in
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userName:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Admin signin successful, returns JWT token
+ *       401:
+ *         description: Invalid credentials
+ */
+>>>>>>> 50a48e8e26852eef2f8988b343ccdf0c495bdbef
 router.post("/admin/signin", adminController.adminSignin);
 router.post("/admin/logout", checkAuth, adminController.adminLogout);
 

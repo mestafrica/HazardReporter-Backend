@@ -9,6 +9,7 @@ import config from "./config/config";
 import logging from "./config/logging";
 import { swaggerSpec } from "./config/swagger";
 import adminRoutes from "./router/admin";
+import announcementRoutes from "./router/announcement";
 import hazardReport from "./router/hazardreport";
 import hazardRoutes from "./router/hazardtypes";
 import resetPasswordRoutes from "./router/resetpassword";
@@ -89,26 +90,26 @@ app.get("/", (req, res) => {
 
 app.use("/api", userRoutes);
 app.use("/api", adminRoutes);
-app.use("/hazard", hazardRoutes);
-app.use("/hazard-report", hazardReport);
+app.use("/admin/hazard", hazardRoutes);
+app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
+<<<<<<< HEAD
 app.use("/comments", commentRoutes);
 // app.use("/announcement", announcementRoutes);
+=======
+app.use("/announcement", announcementRoutes);
+>>>>>>> 50a48e8e26852eef2f8988b343ccdf0c495bdbef
 
 // Error handling for not found routes
-app.use((req, res, next) => {
+app.use((req, res) => {
   const error = new Error("Not found");
   res.status(404).json({
     message: error.message,
   });
 });
 
-// const httpServer = http.createServer(router);
-
-// httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
-
 // Listen for incoming requests
-let port = Number(config.server.port) || 1337;
+const port = Number(config.server.port) || 1337;
 
 const startServer = (currentPort: number) => {
   const server = app.listen(currentPort, () => {
