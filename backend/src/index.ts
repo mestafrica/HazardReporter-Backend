@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import compression from "compression";
+import * as compression from "compression";
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
@@ -105,7 +105,6 @@ app.use("/api", adminRoutes);
 app.use("/admin/hazard", hazardRoutes);
 app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
-app.use("/announcement", announcementRoutes);
 app.use("/announcement", announcementRoutes);
 
 // Error handling for not found routes
