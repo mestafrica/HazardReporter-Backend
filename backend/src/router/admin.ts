@@ -1,16 +1,16 @@
 import express from "express";
 import adminController from "../controllers/admin";
-import hazardReportController from "../controllers/hazardreport";
-import { checkAuth, hasPermission } from "../middlewares/auth";
-import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
 import {
     createAnnouncement,
+    deleteAnnouncement,
     getAllAnnouncements,
     getAnnouncementById,
     updateAnnouncement,
-    deleteAnnouncement
 } from "../controllers/announcement";
+import hazardReportController from "../controllers/hazardreport";
+import { checkAuth, hasPermission } from "../middlewares/auth";
 import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
+import { checkAdmin, extractJWT } from "../middlewares/extractJWT";
 import upload from "../middlewares/upload";
 import { uploadAvatar } from "../middlewares/cloudinaryUpload";
 import User from "../models/user";
@@ -40,13 +40,16 @@ const router = express.Router();
  *                 type: string
  *               confirmPassword:
  *                 type: string
+ *               avatar:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Admin signup successful
  *       400:
  *         description: Invalid input
  */
-router.post("/admin/signup", upload.none(), adminController.adminSignup);
+router.post("/admin/signup", uploadAvatar.single('avatar'), adminController.adminSignup);
 
 /**
  * @swagger
@@ -204,10 +207,10 @@ router.patch("/admin/profile", extractJWT, checkAdmin, uploadAvatar.single('avat
  *         description: Forbidden - insufficient permissions
  */
 router.get(
-    "/admin/reports",
-    checkAuth,
-    hasPermission("view_reports"),
-    hazardReportController.getAllHazardReports
+  "/admin/reports",
+  checkAuth,
+  hasPermission("view_reports"),
+  hazardReportController.getAllHazardReports,
 );
 
 /**
@@ -227,10 +230,10 @@ router.get(
  *         description: Forbidden - insufficient permissions
  */
 router.get(
-    "/admin/reports/stats",
-    checkAuth,
-    hasPermission("view_reports"),
-    hazardReportController.getHazardReportStats
+  "/admin/reports/stats",
+  checkAuth,
+  hasPermission("view_reports"),
+  hazardReportController.getHazardReportStats,
 );
 
 /**
@@ -267,10 +270,10 @@ router.get(
  *         description: Forbidden - insufficient permissions
  */
 router.patch(
-    "/admin/reports/:id/status",
-    checkAuth,
-    hasPermission("update_report_status"),
-    hazardReportController.updateReportStatus
+  "/admin/reports/:id/status",
+  checkAuth,
+  hasPermission("update_report_status"),
+  hazardReportController.updateReportStatus,
 );
 
 /**
@@ -310,11 +313,11 @@ router.patch(
  *         description: Forbidden - not admin
  */
 router.post(
-    "/admin/announcements",
-    extractJWT,
-    checkAdmin,
-    uploadAnnouncementFiles.array("attachments", 5),
-    createAnnouncement
+  "/admin/announcements",
+  extractJWT,
+  checkAdmin,
+  uploadAnnouncementFiles.array("attachments", 5),
+  createAnnouncement,
 );
 
 /**
@@ -390,11 +393,11 @@ router.get("/admin/announcements/:id", getAnnouncementById);
  *         description: Forbidden - not admin
  */
 router.patch(
-    "/admin/announcements/:id",
-    extractJWT,
-    checkAdmin,
-    uploadAnnouncementFiles.array("attachments", 5),
-    updateAnnouncement
+  "/admin/announcements/:id",
+  extractJWT,
+  checkAdmin,
+  uploadAnnouncementFiles.array("attachments", 5),
+  updateAnnouncement,
 );
 
 /**
@@ -420,10 +423,10 @@ router.patch(
  *         description: Forbidden - not admin
  */
 router.delete(
-    "/admin/announcements/:id",
-    extractJWT,
-    checkAdmin,
-    deleteAnnouncement
+  "/admin/announcements/:id",
+  extractJWT,
+  checkAdmin,
+  deleteAnnouncement,
 );
 
 /**
@@ -443,11 +446,10 @@ router.delete(
  *         description: Forbidden - insufficient permissions
  */
 router.get(
-    "/admin/users",
-    checkAuth,
-    hasPermission("read_users"),
-    adminController.getAllUsers
+  "/admin/users",
+  checkAuth,
+  hasPermission("read_users"),
+  adminController.getAllUsers,
 );
-
 
 export default router;

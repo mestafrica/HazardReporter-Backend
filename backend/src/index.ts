@@ -82,6 +82,7 @@ app.get("/api-docs.json", (req: Request, res: Response) => {
   res.send(getSwaggerSpec(req));
 });
 
+// Swagger documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(undefined, {
   swaggerOptions: {
     url: "/api-docs.json",
@@ -101,13 +102,14 @@ app.get("/", (req, res) => {
 app.use("/api", healthRoutes);
 app.use("/api", userRoutes);
 app.use("/api", adminRoutes);
-app.use("/hazard", hazardRoutes);
-app.use("/hazard-report", hazardReport);
+app.use("/admin/hazard", hazardRoutes);
+app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
+app.use("/announcement", announcementRoutes);
 app.use("/announcement", announcementRoutes);
 
 // Error handling for not found routes
-app.use((req, res, next) => {
+app.use((req, res) => {
   const error = new Error("Not found");
   res.status(404).json({
     message: error.message,
@@ -123,7 +125,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Listen for incoming requests
-let port = Number(config.server.port) || 1337;
+const port = Number(config.server.port) || 1337;
 
 const startServer = (currentPort: number) => {
   const server = app.listen(currentPort, () => {
