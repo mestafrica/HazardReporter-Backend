@@ -9,6 +9,8 @@ export const roles = [
             'view_reports',
             'update_report_status',
             'manage_announcements',
+            'moderate_reports',   
+            'delete_reports',     
         ]
     },
     {

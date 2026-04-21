@@ -350,13 +350,89 @@ const updateReportStatus = async (
   }
 };
 
-export default {
-  createHazardReport,
-  updateHazardReport,
-  getHazardReportById,
-  getAllHazardReports,
-  getUserHazardCount,
-  deleteHazardReport,
-  getHazardReportStats,
-  updateReportStatus,
+
+// Admin content moderation — confirm, investigate, resolve, mark as spam
+const moderateReport = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        const { status, moderationNote } = req.body;
+
+        // Validate status
+        const allowedStatuses = ['confirmed', 'investigating', 'resolved', 'spam'];
+        if (!status || !allowedStatuses.includes(status)) {
+            return res.status(400).json({
+                message: `Invalid status. Allowed values are: ${allowedStatuses.join(', ')}`
+            });
+        }
+
+        // Validate ID format
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid report ID format' });
+        }
+
+        const adminId = req.user?.id;
+        if (!adminId) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const updatedReport = await HazardReport.findByIdAndUpdate(
+            id,
+            {
+                status,
+                moderatedBy: adminId,
+                moderatedAt: new Date(),
+                moderationNote: moderationNote || null,
+            },
+            { new: true }
+        ).populate('user', 'userName phoneNumber email')
+         .populate('moderatedBy', 'userName email');
+
+        if (!updatedReport) {
+            return res.status(404).json({ message: 'Hazard report not found' });
+        }
+
+        return res.status(200).json({
+            message: `Report marked as ${status} successfully`,
+            report: updatedReport,
+        });
+    } catch (error) {
+        console.error('Error moderating report:', error);
+        next(error);
+    }
 };
+
+// Admin delete report
+const deleteReportByAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid report ID format' });
+        }
+
+        const deletedReport = await HazardReport.findByIdAndDelete(id);
+
+        if (!deletedReport) {
+            return res.status(404).json({ message: 'Hazard report not found' });
+        }
+
+        return res.status(200).json({ message: 'Hazard report deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting report:', error);
+        next(error);
+    }
+};
+
+export default {
+    createHazardReport,
+    updateHazardReport,
+    getHazardReportById,
+    getAllHazardReports,
+    getUserHazardCount,
+    deleteHazardReport,
+    getHazardReportStats,
+    updateReportStatus,
+    moderateReport,        
+    deleteReportByAdmin,
+};
+

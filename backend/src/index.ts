@@ -86,19 +86,18 @@ app.get("/", (req, res) => {
   res.redirect("/api-docs");
 });
 
-// Use Route
 
+
+// Use Route
 app.use("/api", userRoutes);
 app.use("/api", adminRoutes);
 app.use("/admin/hazard", hazardRoutes);
 app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
-<<<<<<< HEAD
 app.use("/comments", commentRoutes);
-// app.use("/announcement", announcementRoutes);
-=======
-app.use("/announcement", announcementRoutes);
->>>>>>> 50a48e8e26852eef2f8988b343ccdf0c495bdbef
+
+
+
 
 // Error handling for not found routes
 app.use((req, res) => {
