@@ -64,10 +64,11 @@ router.post("/users/register", uploadAvatar.single('avatar'), controller.registe
  *         description: Invalid credentials
  */
 router.post("/users/login", upload.none(), controller.login);
+
 /**
  * @swagger
- * /users:
- *   patch:
+ * /users/create:
+ *   post:
  *     summary: Create a new user (admin only)
  *     tags: [Users]
  *     security:
@@ -98,8 +99,8 @@ router.post("/users/login", upload.none(), controller.login);
  *       403:
  *         description: Forbidden - insufficient permissions
  */
-router.patch(
-    "/users/",
+router.post(
+    "/users/create",
     checkAuth,
     hasPermission("create_user"),
     uploadAvatar.single('avatar'),
@@ -151,6 +152,36 @@ router.patch(
     hasPermission("update_user"),
     uploadAvatar.single('avatar'),
     controller.editUser,
+);
+
+/**
+ * @swagger
+ * /users/{id}:
+ *   get:
+ *     summary: Get a user by ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ */
+router.get(
+    "/users/:id",
+    checkAuth,
+    hasPermission("read_users"),
+    controller.getUserById,
 );
 
 /**

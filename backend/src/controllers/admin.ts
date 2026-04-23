@@ -61,7 +61,6 @@ const adminSignup = async (req: Request, res: Response, next: NextFunction) => {
             phoneNumber,
             email,
             password: hash,
-            confirmPassword: hash,
             role: "admin",
             avatar,
         });

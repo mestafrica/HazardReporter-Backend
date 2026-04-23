@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import IUser from "../models/user";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import {
   forgotPasswordValidator,
   loginValidator,
   resetPasswordValidator,
 } from "../validators/user";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { ResetTokenModel } from "../models/token";
 import { mailTransport } from "../utils/sendEmail";
 
@@ -25,7 +25,7 @@ const token = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(401).json("User Not Found");
     }
     // Verify their password
-    const correctPassword = bcrypt.compareSync(value.password, user.password);
+    const correctPassword = bcryptjs.compareSync(value.password, user.password);
     if (!correctPassword) {
       return res.status(401).json("Invalid Credentials");
     }
@@ -130,7 +130,7 @@ const resetPassword = async (
       return res.status(409).json("Invalid Reset Token");
     }
     // Encrypt user password
-    const hashedPassword = bcrypt.hashSync(value.password, 10);
+    const hashedPassword = bcryptjs.hashSync(value.password, 10);
     // Update user password
     await IUser.findByIdAndUpdate(resetToken.userId, {
       password: hashedPassword,
