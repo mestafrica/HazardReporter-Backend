@@ -177,4 +177,4 @@ router.delete('/delete/:id', extractJWT, checkAdmin, deleteAnnouncement);
  */
 router.delete('/attachment/:id/:attachmentId', extractJWT, checkAdmin, deleteAnnouncementAttachment);
 
-export = router;
+export default router;
