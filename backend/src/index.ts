@@ -8,9 +8,10 @@ import swaggerUi from "swagger-ui-express";
 import config from "./config/config";
 import logging from "./config/logging";
 import { swaggerSpec } from "./config/swagger";
-import adminRoutes from "./router/admin";
 import announcementRoutes from "./router/announcement";
+import adminRoutes from "./router/admin";
 import hazardReport from "./router/hazardreport";
+import airQualityRoutes from "./router/airquality";
 import hazardRoutes from "./router/hazardtypes";
 import resetPasswordRoutes from "./router/resetpassword";
 import userRoutes from "./router/user";
@@ -93,6 +94,7 @@ app.use("/admin/hazard", hazardRoutes);
 app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
 app.use("/announcement", announcementRoutes);
+app.use("/air-quality", airQualityRoutes);
 
 // Error handling for not found routes
 app.use((req, res) => {
@@ -110,7 +112,7 @@ const startServer = (currentPort: number) => {
     console.log(`App listening on port ${currentPort}`);
   });
 
-  server.on("error", (err: any) => {
+  server.on("error", (err: NodeJS.ErrnoException) => {
     if (err.code === "EADDRINUSE") {
       console.log(
         `Port ${currentPort} is already in use. Trying port ${currentPort + 1}...`,
