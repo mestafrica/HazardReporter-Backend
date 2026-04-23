@@ -94,7 +94,7 @@ app.use("/admin/hazard", hazardRoutes);
 app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
 app.use("/announcement", announcementRoutes);
-app.use("/airquality", airQualityRoutes);
+app.use("/air-quality", airQualityRoutes);
 
 // Error handling for not found routes
 app.use((req, res) => {
