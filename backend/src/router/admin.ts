@@ -4,11 +4,11 @@ import hazardReportController from "../controllers/hazardreport";
 import { checkAuth, hasPermission } from "../middlewares/auth";
 import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
 import {
-    createAnnouncement,
-    getAllAnnouncements,
-    getAnnouncementById,
-    updateAnnouncement,
-    deleteAnnouncement,
+  createAnnouncement,
+  getAllAnnouncements,
+  getAnnouncementById,
+  updateAnnouncement,
+  deleteAnnouncement,
 } from "../controllers/announcement";
 import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
 
@@ -21,68 +21,68 @@ router.post("/admin/logout", checkAuth, adminController.adminLogout);
 
 // ─── Report Routes (protected) ────────────────────────────────────────────────
 router.get(
-    "/admin/reports",
-    checkAuth,
-    hasPermission("view_reports"),
-    hazardReportController.getAllHazardReports,
+  "/admin/reports",
+  checkAuth,
+  hasPermission("view_reports"),
+  hazardReportController.getAllHazardReports,
 );
 router.get(
-    "/admin/reports/stats",
-    checkAuth,
-    hasPermission("view_reports"),
-    hazardReportController.getHazardReportStats,
+  "/admin/reports/stats",
+  checkAuth,
+  hasPermission("view_reports"),
+  hazardReportController.getHazardReportStats,
 );
 router.patch(
-    "/admin/reports/:id/status",
-    checkAuth,
-    hasPermission("update_report_status"),
-    hazardReportController.updateReportStatus,
+  "/admin/reports/:id/status",
+  checkAuth,
+  hasPermission("update_report_status"),
+  hazardReportController.updateReportStatus,
 );
 
 // ─── Content Moderation Routes (protected) ────────────────────────────────────
 router.patch(
-    "/admin/reports/:id/moderate",       // confirm, investigate, resolve, spam
-    checkAuth,
-    hasPermission("moderate_reports"),
-    hazardReportController.moderateReport,
+  "/admin/reports/:id/status",
+  checkAuth,
+  hasPermission("update_report_status"),
+  hazardReportController.updateReportStatus,
 );
 router.delete(
-    "/admin/reports/:id",                // delete report
-    checkAuth,
-    hasPermission("delete_reports"),
-    hazardReportController.deleteReportByAdmin,
+  "/admin/reports/:id",
+  checkAuth,
+  hasPermission("delete_reports"),
+  hazardReportController.deleteReportByAdmin,
 );
 
 // ─── Announcement Routes (protected) ──────────────────────────────────────────
 router.post(
-    "/admin/announcements",
-    extractJWT,
-    checkAdmin,
-    uploadAnnouncementFiles.array("attachments", 5),
-    createAnnouncement,
+  "/admin/announcements",
+  extractJWT,
+  checkAdmin,
+  uploadAnnouncementFiles.array("attachments", 5),
+  createAnnouncement,
 );
 router.get("/admin/announcements", getAllAnnouncements);
 router.get("/admin/announcements/:id", getAnnouncementById);
 router.patch(
-    "/admin/announcements/:id",
-    extractJWT,
-    checkAdmin,
-    uploadAnnouncementFiles.array("attachments", 5),
-    updateAnnouncement,
+  "/admin/announcements/:id",
+  extractJWT,
+  checkAdmin,
+  uploadAnnouncementFiles.array("attachments", 5),
+  updateAnnouncement,
 );
 router.delete(
-    "/admin/announcements/:id",
-    extractJWT,
-    checkAdmin,
-    deleteAnnouncement,
+  "/admin/announcements/:id",
+  extractJWT,
+  checkAdmin,
+  deleteAnnouncement,
 );
 
 // ─── User Routes (protected) ──────────────────────────────────────────────────
 router.get(
-    "/admin/users",
-    checkAuth,
-    hasPermission("read_users"),
-    adminController.getAllUsers,
+  "/admin/users",
+  checkAuth,
+  hasPermission("read_users"),
+  adminController.getAllUsers,
 );
 
 export default router;
