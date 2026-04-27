@@ -37,7 +37,7 @@ const router = express.Router();
  *       400:
  *         description: Invalid input or user already exists
  */
-router.post("/users/register", upload.single('avatar'), controller.register);
+router.post("/users/register", upload.single("avatar"), controller.register);
 
 /**
  * @swagger
@@ -98,11 +98,11 @@ router.post("/users/login", controller.login);
  *         description: Forbidden - insufficient permissions
  */
 router.patch(
-    "/users/",
-    checkAuth,
-    hasPermission("create_user"),
-    upload.single('avatar'),
-    controller.createUser,
+  "/users/",
+  checkAuth,
+  hasPermission("create_user"),
+  upload.single("avatar"),
+  controller.createUser,
 );
 
 /**
@@ -145,11 +145,11 @@ router.patch(
  *         description: Forbidden - insufficient permissions
  */
 router.patch(
-    "/users/:id",
-    checkAuth,
-    hasPermission("update_user"),
-    upload.single('avatar'),
-    controller.editUser,
+  "/users/:id",
+  checkAuth,
+  hasPermission("update_user"),
+  upload.single("avatar"),
+  controller.editUser,
 );
 
 /**
@@ -176,10 +176,10 @@ router.patch(
  *         description: Forbidden - insufficient permissions
  */
 router.delete(
-    "/users/:id",
-    checkAuth,
-    hasPermission("delete_user"),
-    controller.deleteUser,
+  "/users/:id",
+  checkAuth,
+  hasPermission("delete_user"),
+  controller.deleteUser,
 );
 
 /**

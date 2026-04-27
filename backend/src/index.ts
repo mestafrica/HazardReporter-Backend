@@ -9,11 +9,12 @@ import config from "./config/config";
 import logging from "./config/logging";
 import { swaggerSpec } from "./config/swagger";
 import adminRoutes from "./router/admin";
+import airQualityRoutes from "./router/airquality";
+import announcementRoutes from "./router/announcement";
+import commentRoutes from "./router/comment";
 import hazardReport from "./router/hazardreport";
-import hazardRoutes from "./router/hazardtypes";
 import resetPasswordRoutes from "./router/resetpassword";
 import userRoutes from "./router/user";
-import announcementRoutes from "./router/announcement";
 dotenv.config();
 
 const NAMESPACE = "Server";
@@ -86,13 +87,13 @@ app.get("/", (req, res) => {
 });
 
 // Use Route
-
 app.use("/api", userRoutes);
 app.use("/api", adminRoutes);
-app.use("/admin/hazard", hazardRoutes);
 app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
+app.use("/comments", commentRoutes);
 app.use("/announcement", announcementRoutes);
+app.use("/air-quality", airQualityRoutes);
 
 // Error handling for not found routes
 app.use((req, res) => {
@@ -110,7 +111,7 @@ const startServer = (currentPort: number) => {
     console.log(`App listening on port ${currentPort}`);
   });
 
-  server.on("error", (err: any) => {
+  server.on("error", (err: NodeJS.ErrnoException) => {
     if (err.code === "EADDRINUSE") {
       console.log(
         `Port ${currentPort} is already in use. Trying port ${currentPort + 1}...`,
