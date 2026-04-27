@@ -7,11 +7,6 @@ import { IHazardReport } from "../interfaces/hazardreport";
 
 const NAMESPACE = "HazardReport";
 
-type UploadedFile = {
-  filename: string;
-  path: string;
-};
-
 type RequestWithFiles = Request & {
   files?: unknown;
 };
@@ -24,36 +19,35 @@ const createHazardReport = async (
   try {
     const { error, value } = hazardreportValidator.validate({
       ...req.body,
-      images: ((req.files as Express.Multer.File[] | undefined) || []).map(
-        (file) => file.path
-      ),
+      images:
+        (req.files as Express.Multer.File[] | undefined)
+          ?.filter((file) => file && (file as any).path)
+          ?.map((file) => (file as any).path) || [],
     });
-  
-  if (error) {
+
+    if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
+
     const userId = req.user?.id;
-    
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Create hazard report with explicit type
     const hazardReport = (await HazardReport.create({
       ...value,
       user,
     })) as IHazardReport & { _id: Types.ObjectId };
-    
 
-    // Add the new hazard report's ID to the user's reports array
     user.reports.push(hazardReport._id);
     await user.save();
-   
+
     return res
       .status(201)
       .json({ message: "Hazard Report created successfully", hazardReport });
@@ -71,7 +65,7 @@ const getAllHazardReports = async (
   try {
     const hazardReports = await HazardReport.find().populate(
       "user",
-      "firstName lastName userName",
+      "userName phoneNumber email",
     );
     return res.status(200).json({
       message: "All Hazard Reports retrieved successfully",
@@ -91,25 +85,20 @@ const getHazardReportById = async (
 ) => {
   const hazardReportId = req.params.id;
   try {
-    // Validate the ID format (assuming it's an ObjectId)
     if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
       return res
         .status(400)
         .json({ message: "Invalid hazard report ID format" });
     }
 
-    // Fetch the hazard report by ID
     const hazardreport = await HazardReport.findById(hazardReportId).exec();
 
     if (hazardreport) {
-      return res.status(200).json({
-        message: "Hazard Report found",
-        hazardreport,
-      });
+      return res
+        .status(200)
+        .json({ message: "Hazard Report found", hazardreport });
     } else {
-      return res.status(404).json({
-        message: "Hazard Report not found",
-      });
+      return res.status(404).json({ message: "Hazard Report not found" });
     }
   } catch (error) {
     console.error("Error fetching hazard report by ID:", error);
@@ -117,19 +106,26 @@ const getHazardReportById = async (
   }
 };
 
-const updateHazardReport = async (req: Request, res: Response, next: NextFunction) => {
+const updateHazardReport = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const hazardReportId = req.params.id;
 
   try {
     const { title, description } = req.body;
 
     if (!title || !description) {
-      return res.status(400).json({ message: "Title or description are required" });
+      return res
+        .status(400)
+        .json({ message: "Title or description are required" });
     }
 
-    // Validate the ID format
     if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
-      return res.status(400).json({ message: "Invalid hazard report ID format" });
+      return res
+        .status(400)
+        .json({ message: "Invalid hazard report ID format" });
     }
 
     const hazardReport = await HazardReport.findById(hazardReportId);
@@ -145,27 +141,29 @@ const updateHazardReport = async (req: Request, res: Response, next: NextFunctio
     }
 
     if (hazardReport.user.toString() !== userId) {
-      return res.status(403).json({ message: "You can only edit your own hazard report." });
+      return res
+        .status(403)
+        .json({ message: "You can only edit your own hazard report." });
     }
 
     const oneHour = 60 * 60 * 1000;
-    const timeDifference = Date.now() - new Date(hazardReport.createdAt).getTime();
+    const timeDifference =
+      Date.now() - new Date(hazardReport.createdAt).getTime();
 
     if (timeDifference > oneHour) {
       return res.status(403).json({
-        message: "You can only edit a hazard report within 1 hour of posting it."
+        message:
+          "You can only edit a hazard report within 1 hour of posting it.",
       });
     }
 
     hazardReport.title = title;
     hazardReport.description = description;
-
     await hazardReport.save();
 
-    return res.status(200).json({
-      message: "Hazard Report updated successfully",
-      hazardReport
-    });
+    return res
+      .status(200)
+      .json({ message: "Hazard Report updated successfully", hazardReport });
   } catch (error) {
     console.error("Error updating hazard report:", error);
     next(error);
@@ -178,25 +176,20 @@ const getUserHazardCount = async (
   next: NextFunction,
 ) => {
   try {
-    const jwtId = req.user?.id; // Extract user ID from the JWT
+    const jwtId = req.user?.id;
 
-    // Check if the user ID exists in the JWT
     if (!jwtId) {
       return res
         .status(401)
         .json({ message: "Unauthorized: User ID is missing in JWT" });
     }
-    // Validate that the user ID is a valid MongoDB ObjectId
+
     if (!mongoose.isValidObjectId(jwtId)) {
       return res.status(400).json({ message: "Invalid User ID format" });
     }
 
-    // Convert the user ID to a MongoDB ObjectId
     const userId = mongoose.Types.ObjectId.createFromHexString(jwtId);
-
-    // Fetch the hazard reports associated with the user
     const hazardReports = await HazardReport.find({ user: userId }).exec();
-    console.log("Hazard Reports Retrieved:", hazardReports);
 
     return res.status(200).json({
       message: "User Hazard Reports retrieved successfully",
@@ -217,25 +210,21 @@ const deleteHazardReport = async (
   const hazardReportId = req.params.id;
 
   try {
-    // Validate the ID format
     if (!mongoose.Types.ObjectId.isValid(hazardReportId)) {
       return res
         .status(400)
         .json({ message: "Invalid hazard report ID format" });
     }
 
-    // Delete the hazard report
     const deletedHazardReport =
       await HazardReport.findByIdAndDelete(hazardReportId).exec();
-    
+
     if (deletedHazardReport) {
-      return res.status(200).json({
-        message: "Hazard Report deleted successfully",
-      });
+      return res
+        .status(200)
+        .json({ message: "Hazard Report deleted successfully" });
     } else {
-      return res.status(404).json({
-        message: "Hazard Report not found",
-      });
+      return res.status(404).json({ message: "Hazard Report not found" });
     }
   } catch (error) {
     console.error("Error deleting hazard report:", error);
@@ -243,67 +232,35 @@ const deleteHazardReport = async (
   }
 };
 
-// Function for the hazard report statistics endpoint
 const getHazardReportStats = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    // Total number of reports
     const totalReports = await HazardReport.countDocuments();
 
-    // Reports grouped by hazard type
     const reportsByHazardType = await HazardReport.aggregate([
-      {
-        $group: {
-          _id: "$hazardtype",
-          count: { $sum: 1 },
-        },
-      },
-      { $sort: { count: -1 } }, // highest first
-    ]);
-
-    // Reports grouped by status
-    const reportsByStatus = await HazardReport.aggregate([
-      {
-        $group: {
-          _id: "$status",
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-
-    // Reports grouped by city
-    const reportsByCity = await HazardReport.aggregate([
-      {
-        $group: {
-          _id: "$city",
-          count: { $sum: 1 },
-        },
-      },
-      { $sort: { count: -1 } }, // highest first
-    ]);
-
-    // Reports grouped by country
-    const reportsByCountry = await HazardReport.aggregate([
-      {
-        $group: {
-          _id: "$country",
-          count: { $sum: 1 },
-        },
-      },
+      { $group: { _id: "$hazardtype", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
     ]);
 
-    // Reports per user (top reporters)
+    const reportsByStatus = await HazardReport.aggregate([
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]);
+
+    const reportsByCity = await HazardReport.aggregate([
+      { $group: { _id: "$city", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+
+    const reportsByCountry = await HazardReport.aggregate([
+      { $group: { _id: "$country", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+
     const reportsByUser = await HazardReport.aggregate([
-      {
-        $group: {
-          _id: "$user",
-          count: { $sum: 1 },
-        },
-      },
+      { $group: { _id: "$user", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       {
         $lookup: {
@@ -316,15 +273,12 @@ const getHazardReportStats = async (
       {
         $project: {
           count: 1,
-          "userDetails.firstName": 1,
-          "userDetails.lastName": 1,
           "userDetails.userName": 1,
           "userDetails.email": 1,
         },
       },
     ]);
 
-    // Reports created per month (for charts/graphs)
     const reportsByMonth = await HazardReport.aggregate([
       {
         $group: {
@@ -356,7 +310,7 @@ const getHazardReportStats = async (
   }
 };
 
-// Function to update report status
+// Admin updates report status only
 const updateReportStatus = async (
   req: Request,
   res: Response,
@@ -364,33 +318,51 @@ const updateReportStatus = async (
 ) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, moderationNote } = req.body;
 
-    // Validate status value
-    const allowedStatuses = ["open", "in progress", "resolved"];
+    // All allowed statuses
+    const allowedStatuses = [
+      "pending",
+      "confirmed",
+      "investigating",
+      "resolved",
+      "spam",
+    ];
     if (!status || !allowedStatuses.includes(status)) {
       return res.status(400).json({
         message: `Invalid status. Allowed values are: ${allowedStatuses.join(", ")}`,
       });
     }
 
-    // Validate ID format
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid report ID format" });
     }
 
+    const adminId = req.user?.id;
+    if (!adminId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Only update status related fields — never touches title, description etc
     const updatedReport = await HazardReport.findByIdAndUpdate(
       id,
-      { status },
+      {
+        status,
+        moderatedBy: adminId,
+        moderatedAt: new Date(),
+        moderationNote: moderationNote || null,
+      },
       { new: true },
-    ).populate("user", "userName phoneNumber email");
+    )
+      .populate("user", "userName phoneNumber email")
+      .populate("moderatedBy", "userName email");
 
     if (!updatedReport) {
       return res.status(404).json({ message: "Hazard report not found" });
     }
 
     return res.status(200).json({
-      message: "Report status updated successfully",
+      message: `Report status updated to ${status} successfully`,
       report: updatedReport,
     });
   } catch (error) {
@@ -399,66 +371,42 @@ const updateReportStatus = async (
   }
 };
 
-const upvoteHazardReport = async (
+// Admin delete report
+const deleteReportByAdmin = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
     const { id } = req.params;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid hazard report ID format" });
+      return res.status(400).json({ message: "Invalid report ID format" });
     }
 
-    const hazardReport = await HazardReport.findById(id);
+    const deletedReport = await HazardReport.findByIdAndDelete(id);
 
-    if (!hazardReport) {
-      return res.status(404).json({ message: "Not found" });
+    if (!deletedReport) {
+      return res.status(404).json({ message: "Hazard report not found" });
     }
 
-    // Check if user already upvoted
-    const alreadyUpvoted = (hazardReport.upvotedBy || []).some(
-      (user) => user.toString() === userId
-    );
-
-    if (alreadyUpvoted) {
-      return res.status(400).json({
-        message: "You have already upvoted this report",
-      });
-    }
-
-    hazardReport.upvotedBy = hazardReport.upvotedBy || [];
-    hazardReport.upvotedBy.push(userId);
-
-    hazardReport.upvotes = (hazardReport.upvotes || 0) + 1;
-
-    await hazardReport.save();
-
-    return res.status(200).json({
-      message: "Upvoted successfully",
-      hazardReport,
-    });
+    return res
+      .status(200)
+      .json({ message: "Hazard report deleted successfully" });
   } catch (error) {
-    console.error("Error upvoting hazard report:", error);
+    console.error("Error deleting report:", error);
     next(error);
   }
 };
 
 export default {
   createHazardReport,
+  updateHazardReport,
+  getHazardReportById,
+  getAllHazardReports,
   getUserHazardCount,
   deleteHazardReport,
-  getAllHazardReports,
-  getHazardReportById,
-  updateHazardReport,
   getHazardReportStats,
-  upvoteHazardReport,
   updateReportStatus,
+  deleteReportByAdmin,
 };
-

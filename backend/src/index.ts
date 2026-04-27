@@ -15,6 +15,7 @@ import airQualityRoutes from "./router/airquality";
 import hazardRoutes from "./router/hazardtypes";
 import resetPasswordRoutes from "./router/resetpassword";
 import userRoutes from "./router/user";
+import commentRoutes from "./router/comment";
 dotenv.config();
 
 const NAMESPACE = "Server";
@@ -87,12 +88,11 @@ app.get("/", (req, res) => {
 });
 
 // Use Route
-
 app.use("/api", userRoutes);
 app.use("/api", adminRoutes);
-app.use("/admin/hazard", hazardRoutes);
 app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
+app.use("/comments", commentRoutes);
 app.use("/announcement", announcementRoutes);
 app.use("/air-quality", airQualityRoutes);
 

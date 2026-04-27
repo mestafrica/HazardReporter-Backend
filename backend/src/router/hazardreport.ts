@@ -108,6 +108,7 @@ router.get("/user-reports", extractJWT, controller.getUserHazardCount);
 router.patch(
   "/update/:id",
   extractJWT,
+  checkAdmin,
   controller.updateHazardReport,
 );
 /**
@@ -155,28 +156,8 @@ router.delete(
  *         description: Server error
  */
 router.get("/getall", controller.getAllHazardReports);
-
-/**
- * @swagger
- * /hazard-report/getid/{id}:
- *   get:
- *     summary: Get a hazard report by ID
- *     tags: [Hazard Reports]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Hazard report ID
- *     responses:
- *       200:
- *         description: Hazard report found
- *       404:
- *         description: Hazard report not found
- */
 router.get("/getid/:id", controller.getHazardReportById);
 
-router.patch('/upvote/:id', extractJWT, controller.upvoteHazardReport);
+// router.patch('/upvote/:id', extractJWT, controller.upvoteHazardReport);
 
 export default router;
