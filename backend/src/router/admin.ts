@@ -317,12 +317,7 @@ router.post(
   extractJWT,
   checkAdmin,
   uploadAnnouncementFiles.array("attachments", 5),
-  createAnnouncement,
-  "/admin/announcements",
-  extractJWT,
-  checkAdmin,
-  uploadAnnouncementFiles.array("attachments", 5),
-  createAnnouncement,
+  createAnnouncement
 );
 router.get("/admin/announcements", getAllAnnouncements);
 router.get("/admin/announcements/:id", getAnnouncementById);
@@ -372,22 +367,13 @@ router.patch(
   extractJWT,
   checkAdmin,
   uploadAnnouncementFiles.array("attachments", 5),
-  updateAnnouncement,
-  "/admin/announcements/:id",
-  extractJWT,
-  checkAdmin,
-  uploadAnnouncementFiles.array("attachments", 5),
-  updateAnnouncement,
+  updateAnnouncement
 );
 router.delete(
   "/admin/announcements/:id",
   extractJWT,
   checkAdmin,
-  deleteAnnouncement,
-  "/admin/announcements/:id",
-  extractJWT,
-  checkAdmin,
-  deleteAnnouncement,
+  deleteAnnouncement
 );
 
 // ─── User Routes (protected) ──────────────────────────────────────────────────
@@ -395,11 +381,7 @@ router.get(
   "/admin/users",
   checkAuth,
   hasPermission("read_users"),
-  adminController.getAllUsers,
-  "/admin/users",
-  checkAuth,
-  hasPermission("read_users"),
-  adminController.getAllUsers,
+  adminController.getAllUsers
 );
 
 export default router;

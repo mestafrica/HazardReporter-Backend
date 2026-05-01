@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/user";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import {
   forgotPasswordValidator,
   loginValidator,

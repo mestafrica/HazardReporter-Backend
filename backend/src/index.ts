@@ -112,7 +112,6 @@ app.use("/announcement", announcementRoutes);
 
 // Error handling for not found routes
 app.use((req, res) => {
-app.use((req, res) => {
   const error = new Error("Not found");
   res.status(404).json({
     message: error.message,
@@ -128,7 +127,6 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Listen for incoming requests
-const port = Number(config.server.port) || 1337;
 const port = Number(config.server.port) || 1337;
 
 const startServer = (currentPort: number) => {

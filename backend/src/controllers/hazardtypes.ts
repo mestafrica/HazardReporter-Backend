@@ -6,27 +6,26 @@ import { hazardtypeSchema } from '../validators/hazardtypes';
 const NAMESPACE = 'HazardType';
 
 const createHazardType = async (req: Request, res: Response, next: NextFunction) => {
-
-    const { name } = req.body;
-
-    const _hazardType = new HazardType({
-        _id: new mongoose.Types.ObjectId(),
-        name
-    });
     try {
-     // Validate the data provided to create a hazardtype
-     const { error, value } = hazardtypeSchema.validate(req.body);
-     if (error) {
-         console.error('Validation Error:', error.details[0].message);
-         return res.status(400).send(error.details[0].message);
-     }
+        // Validate the data provided to create a hazardtype
+        const { error, value } = hazardtypeSchema.validate(req.body);
+        if (error) {
+            console.error('Validation Error:', error.details[0].message);
+            return res.status(400).send(error.details[0].message);
+        }
 
-     const name = value.name;
-     console.log('Validation successful. Checking if a hazard type is created:', name);
+        const name = value.name;
+        console.log('Validation successful. Checking if a hazard type is created:', name);
+
+        const _hazardType = new HazardType({
+            _id: new mongoose.Types.ObjectId(),
+            name
+        });
 
         const hazardType = await _hazardType.save();
         return res.status(201).json({
-            message: 'Hazard Type created successfully',     hazardType
+            message: 'Hazard Type created successfully',
+            hazardType
         });
     } catch (error) {
         next(error); 
