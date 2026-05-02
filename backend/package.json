@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "src/index.ts",
   "scripts": {
     "dev": "nodemon --exec tsx src/index.ts",
@@ -9,7 +9,6 @@
     "lint": "eslint 'src/**/*.{ts,js}' --ext .ts --max-warnings=0",
     "test": "vitest"
   },
-  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
