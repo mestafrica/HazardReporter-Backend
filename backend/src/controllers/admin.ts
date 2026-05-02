@@ -61,7 +61,6 @@ const adminSignup = async (req: Request, res: Response, next: NextFunction) => {
             phoneNumber,
             email,
             password: hash,
-            confirmPassword: hash,
             role: "admin",
             avatar,
         });
@@ -108,6 +107,7 @@ const adminSignin = async (req: Request, res: Response, next: NextFunction) => {
         }
 
         const isMatch = bcryptjs.compareSync(password, user.password);
+
         if (!isMatch) {
             return res.status(401).json({ message: "Password is incorrect" });
         }
@@ -172,25 +172,34 @@ const getAllReports = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 // GET ALL USERS
-const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
-    User.find()
-        .select("-password")
-        .exec()
-        .then((users) => {
-            return res.status(200).json({
-                users,
-                count: users.length,
-            });
-        })
-        .catch((error) => {
-            logging.error(NAMESPACE, "Error getting users", error);
-            return res.status(500).json({
-                message: isErrorWithMessage(error)
-                    ? error.message
-                    : "Unknown error occurred",
-                error,
-            });
+const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const users = await User.find().select("-password").exec();
+
+        // Get report counts for each user
+        const usersWithReportCounts = await Promise.all(
+            users.map(async (user) => {
+                const reportCount = await HazardReport.countDocuments({ user: user._id });
+                return {
+                    ...user.toObject(),
+                    reportsCount: reportCount,
+                };
+            })
+        );
+
+        return res.status(200).json({
+            users: usersWithReportCounts,
+            count: usersWithReportCounts.length,
         });
+    } catch (error) {
+        logging.error(NAMESPACE, "Error getting users", error);
+        return res.status(500).json({
+            message: isErrorWithMessage(error)
+                ? error.message
+                : "Unknown error occurred",
+            error,
+        });
+    }
 };
 
 

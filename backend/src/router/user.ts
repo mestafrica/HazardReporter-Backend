@@ -2,6 +2,7 @@ import express from "express";
 import controller from "../controllers/user";
 import { checkAuth, hasPermission } from "../middlewares/auth";
 import upload from "../middlewares/upload";
+import { uploadAvatar } from "../middlewares/cloudinaryUpload";
 
 const router = express.Router();
 
@@ -37,7 +38,7 @@ const router = express.Router();
  *       400:
  *         description: Invalid input or user already exists
  */
-router.post("/users/register", upload.single("avatar"), controller.register);
+router.post("/users/register", uploadAvatar.single('avatar'), controller.register);
 
 /**
  * @swagger
@@ -48,7 +49,7 @@ router.post("/users/register", upload.single("avatar"), controller.register);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -62,11 +63,12 @@ router.post("/users/register", upload.single("avatar"), controller.register);
  *       401:
  *         description: Invalid credentials
  */
-router.post("/users/login", controller.login);
+router.post("/users/login", upload.none(), controller.login);
+
 /**
  * @swagger
- * /users:
- *   patch:
+ * /users/create:
+ *   post:
  *     summary: Create a new user (admin only)
  *     tags: [Users]
  *     security:
@@ -97,12 +99,12 @@ router.post("/users/login", controller.login);
  *       403:
  *         description: Forbidden - insufficient permissions
  */
-router.patch(
-  "/users/",
-  checkAuth,
-  hasPermission("create_user"),
-  upload.single("avatar"),
-  controller.createUser,
+router.post(
+    "/users/create",
+    checkAuth,
+    hasPermission("create_user"),
+    uploadAvatar.single('avatar'),
+    controller.createUser,
 );
 
 /**
@@ -145,11 +147,41 @@ router.patch(
  *         description: Forbidden - insufficient permissions
  */
 router.patch(
-  "/users/:id",
-  checkAuth,
-  hasPermission("update_user"),
-  upload.single("avatar"),
-  controller.editUser,
+    "/users/:id",
+    checkAuth,
+    hasPermission("update_user"),
+    uploadAvatar.single('avatar'),
+    controller.editUser,
+);
+
+/**
+ * @swagger
+ * /users/{id}:
+ *   get:
+ *     summary: Get a user by ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ */
+router.get(
+    "/users/:id",
+    checkAuth,
+    hasPermission("read_users"),
+    controller.getUserById,
 );
 
 /**

@@ -38,7 +38,7 @@ export const uploadHazardFiles = multer({
     limits: {
         fileSize: 5 * 1024 * 1024
     }
-});
+}) as any;
 
 export const uploadAnnouncementFiles = multer({
     storage: announcementStorage,
@@ -59,6 +59,29 @@ export const uploadAnnouncementFiles = multer({
     limits: {
         fileSize: 10 * 1024 * 1024
     }
+}) as any;
+
+const avatarStorage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: 'hazardwatch/avatars',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+        transformation: [{ width: 400, height: 400, crop: 'fill' }]
+    } as any
 });
+
+export const uploadAvatar = multer({
+    storage: avatarStorage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only image files are allowed for avatars!'));
+        }
+    },
+    limits: {
+        fileSize: 5 * 1024 * 1024
+    }
+}) as any;
 
 export default uploadHazardFiles;

@@ -6,7 +6,7 @@
     "start": "node dist/index.js",
     "build": "tsc",
     "dev": "nodemon --exec ts-node src/index.ts",
-    "postInstall": "npm run build",
+    "postinstall": "npm run build",
     "start:prod": "node dist/index.js",
     "lint": "eslint 'src/**/*.{ts,js}' --ext .ts --max-warnings=0",
     "test": "vitest"
@@ -28,6 +28,7 @@
     "@types/mongoose": "^5.11.97",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
     "eslint": "^9.38.0",
@@ -41,7 +42,6 @@
   "dependencies": {
     "@mapbox/node-pre-gyp": "^2.0.3",
     "@reis/mongoose-to-json": "^3.0.0",
-    "@types/bcrypt": "^5.0.2",
     "@types/dotenv": "^8.2.0",
     "@types/handlebars": "^4.1.0",
     "@types/joi": "^17.2.3",
@@ -51,7 +51,7 @@
     "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
-    "cloudinary": "^1.41.3",
+    "cloudinary": "^2.10.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -70,6 +70,7 @@
     "nodemailer": "^8.0.4",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "tar": "^7.5.13"
+    "tar": "^7.5.13",
+    "ws": "^8.20.0"
   }
 }

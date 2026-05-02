@@ -13,10 +13,14 @@ const MONGO_OPTIONS = {
   socketTimeoutMS: Number(process.env.MONGO_OPTIONS_SOCKET_TIMEOUT_MS) || 30000,
   autoIndex: process.env.MONGO_OPTIONS_AUTO_INDEX === "true",
   retryWrites: process.env.MONGO_OPTIONS_RETRY_WRITES === "true",
+  maxPoolSize: Number(process.env.MONGO_MAX_POOL_SIZE) || 10,
+  minPoolSize: Number(process.env.MONGO_MIN_POOL_SIZE) || 2,
+  serverSelectionTimeoutMS: 5000,
+  heartbeatFrequencyMS: 10000,
 };
 
 const SERVER_HOSTNAME = process.env.SERVER_HOSTNAME || "localhost";
-const SERVER_PORT = Number(process.env.SERVER_PORT) || 1337;
+const SERVER_PORT = Number(process.env.SERVER_PORT) || 3001;
 const SERVER_TOKEN_EXPIRETIME =
   Number(process.env.SERVER_TOKEN_EXPIRETIME) || 3600;
 const SERVER_TOKEN_ISSUER = process.env.SERVER_TOKEN_ISSUER || "coolIssuer";

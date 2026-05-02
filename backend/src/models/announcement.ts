@@ -6,15 +6,7 @@ export interface IAnnouncement extends Document {
     category: 'Alert' | 'Info' | 'Update';
     status: 'Pinned' | 'Active' | 'Archived';
     pinToFeed: boolean;
-    location?: {
-        text: string;
-        city?: string;
-        country?: string;
-        coordinates?: {
-            latitude: number;
-            longitude: number;
-        };
-    };
+    location?: string;
     attachments?: {
         _id?: mongoose.Types.ObjectId;
         url: string;
@@ -41,15 +33,7 @@ const announcementSchema: Schema = new Schema({
         default: 'Active' 
     },
     pinToFeed: { type: Boolean, default: false },
-    location: {
-        text: { type: String },
-        city: { type: String },
-        country: { type: String },
-        coordinates: {
-            latitude: { type: Number },
-            longitude: { type: Number }
-        }
-    },
+    location: { type: String, trim: true },
     attachments: [{
         _id: { type: Schema.Types.ObjectId, auto: true },
         url: { type: String, required: true },

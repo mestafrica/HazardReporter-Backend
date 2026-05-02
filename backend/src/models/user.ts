@@ -28,18 +28,19 @@ const ReportSchema: Schema = new Schema({
 
 const UserSchema: Schema = new Schema(
   {
-    userName: { type: String, unique: true, required: true },
-    email: { type: String, unique: true, sparse: true },
-    phoneNumber: { type: String, unique: true, required: true },
+    userName: { type: String, unique: true, required: true, index: true },
+    email: { type: String, unique: true, sparse: true, index: true },
+    phoneNumber: { type: String, unique: true, required: true, index: true },
     password: { type: String, required: true },
-    confirmPassword: { type: String, required: true },
-    role: { type: String, default: "user", enum: ["admin", "user"] },
+    role: { type: String, default: "user", enum: ["admin", "user"], index: true },
     avatar: { type: String, default: "" },
-    reports: [{ type: Types.ObjectId, ref: "Reports" }],
+    isActive: { type: Boolean, default: true, index: true },
+    isVerified: { type: Boolean, default: false },
+    reports: [{ type: Types.ObjectId, ref: "HazardReport" }],
     createResetPasswordToken: { type: String },
     passwordChangedAt: { type: Date },
-    passwordResetToken: { type: String },
-    passwordResetTokenExpires: { type: Date },
+    passwordResetToken: { type: String, index: true },
+    passwordResetTokenExpires: { type: Date, index: true },
   },
   {
     timestamps: true,

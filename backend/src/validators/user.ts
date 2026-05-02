@@ -52,6 +52,8 @@ export const updateUserValidator = Joi.object({
   email: Joi.string().email().optional(),
   role: Joi.string().valid("admin", "user"),
   avatar: Joi.string().optional(),
+  isActive: Joi.boolean().optional(),
+  isVerified: Joi.boolean().optional(),
 });
 
 export const adminSignupValidator = Joi.object({
