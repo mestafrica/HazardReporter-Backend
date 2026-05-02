@@ -1,17 +1,13 @@
-import nodemailer from "nodemailer";
 import { createTransport } from "nodemailer";
 
-
-
-export const mailTransport = nodemailer.createTransport({
+export const mailTransport = createTransport({
   // pool: true,
   host: process.env.SMTP_HOST,
-  port: parseInt(`process.env.SMTP_PORT`),
-  secure: false, 
+  port: parseInt(process.env.SMTP_PORT as string, 10),
+  secure: false,
   auth: {
     user: process.env.SMTP_USERNAME,
-    pass: process.env.SMTP_PASSWORD
-  }
-   // from: process.env.SMTP_EMAIL_FROM
+    pass: process.env.SMTP_PASSWORD,
+  },
+  // from: process.env.SMTP_EMAIL_FROM
 });
-

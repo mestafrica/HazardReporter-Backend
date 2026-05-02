@@ -1,14 +1,14 @@
 import express from "express";
-import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
-import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
 import {
   createAnnouncement,
+  deleteAnnouncement,
+  deleteAnnouncementAttachment,
   getAllAnnouncements,
   getAnnouncementById,
   updateAnnouncement,
-  deleteAnnouncement,
-  deleteAnnouncementAttachment,
 } from "../controllers/announcement";
+import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
+import { checkAdmin, extractJWT } from "../middlewares/extractJWT";
 
 const router = express.Router();
 

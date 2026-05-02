@@ -1,8 +1,8 @@
 import express from "express";
 import {
     createComment,
+    deleteComment,
     getCommentsByTarget,
-    deleteComment
 } from "../controllers/comment";
 import { checkAuth } from "../middlewares/auth";
 

@@ -64,7 +64,7 @@ export const getAllAnnouncements = async (
   try {
     const { status, category, search } = req.query;
 
-    let query: any = {};
+    const query: any = {};
 
     if (status && status !== "All Status") {
       query.status = status;

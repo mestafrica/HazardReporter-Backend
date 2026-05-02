@@ -1,30 +1,5 @@
-import {IUser} from "../interfaces/user";
-// import bcrypt from "bcrypt";
-// import crypto from "crypto";
 import mongoose, { Schema, Types } from "mongoose";
-// import { toJSON } from "@reis/mongoose-to-json";
-// import mongooseToJson from '@reis/mongoose-to-json';
-// import mongooseErrors from "mongoose-errors";
-
-const bcryptSalt = process.env.BCRYPT_SALT;
-
-// define  report schema
-const ReportSchema: Schema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  reportType: {
-    type: String,
-    required: true,
-    enum: ["bug", "feedback", "other"],
-  },
-
-  description: { type: String, required: true },
-  status: {
-    type: String,
-    enum: ["open", "in progress", "resolved"],
-    default: "open",
-  },
-  createdAt: { type: Date, default: Date.now },
-});
+import { IUser } from "../interfaces/user";
 
 const UserSchema: Schema = new Schema(
   {

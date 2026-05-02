@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose, { Types } from "mongoose";
+import { IHazardReport } from "../interfaces/hazardreport";
 import HazardReport from "../models/hazardreport";
 import User from "../models/user";
 import { hazardreportValidator } from "../validators/hazardreport";
-import { IHazardReport } from "../interfaces/hazardreport";
 
 const NAMESPACE = "HazardReport";
 

@@ -1,16 +1,14 @@
+import bcryptjs from "bcryptjs";
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import bcryptjs from "bcryptjs";
 import logging from "../config/logging";
-import User from "../models/user";
-import HazardReport from "../models/hazardreport";
 import signJWT from "../functions/signJWT";
+import User from "../models/user";
 import {
   createUserValidator,
   loginValidator,
   registerValidator,
   updateUserValidator,
-  adminSigninValidator,
 } from "../validators/user";
 
 const NAMESPACE = "User";
@@ -84,7 +82,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
 // Function to login user (token)
 const login = async (req: Request, res: Response, next: NextFunction) => {
-  const { userName, password } = req.body;
+  const { userName } = req.body;
   try {
     // Validate request
     const { value, error } = loginValidator.validate(req.body);
@@ -227,11 +225,6 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-// Function for an admin to create a user
-
-// export default { register, login, createUser, logout, editUser, deleteUser, getAllUsers,getAllReports };
-
-// Single clean export default.
 export default {
   register,
   login,

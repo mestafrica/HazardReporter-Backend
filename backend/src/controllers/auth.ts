@@ -1,14 +1,14 @@
-import { NextFunction, Request, Response } from "express";
-import User from "../models/user";
 import bcrypt from "bcrypt";
+import { NextFunction, Request, Response } from "express";
+import * as jwt from "jsonwebtoken";
+import { ResetTokenModel } from "../models/token";
+import User from "../models/user";
+import { mailTransport } from "../utils/sendEmail";
 import {
   forgotPasswordValidator,
   loginValidator,
   resetPasswordValidator,
 } from "../validators/user";
-import * as jwt from "jsonwebtoken";
-import { ResetTokenModel } from "../models/token";
-import { mailTransport } from "../utils/sendEmail";
 
 const token = async (req: Request, res: Response, next: NextFunction) => {
   try {

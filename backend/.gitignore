@@ -43,3 +43,5 @@ build/
 # Misc
 *.tmp
 *.swp
+
+src/**/*.tsbuildinfo
