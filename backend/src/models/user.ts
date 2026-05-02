@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { IUser } from "../interfaces/user";
 
 const UserSchema: Schema = new Schema(
@@ -10,7 +10,7 @@ const UserSchema: Schema = new Schema(
     confirmPassword: { type: String, required: true },
     role: { type: String, default: "user", enum: ["admin", "user"] },
     avatar: { type: String, default: "" },
-    reports: [{ type: Types.ObjectId, ref: "Reports" }],
+    reports: [{ type: Schema.Types.ObjectId, ref: "Reports" }],
     createResetPasswordToken: { type: String },
     passwordChangedAt: { type: Date },
     passwordResetToken: { type: String },
