@@ -7,8 +7,8 @@ import {
   getAnnouncementById,
   updateAnnouncement,
 } from "../controllers/announcement";
-import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
 import { checkAdmin, extractJWT } from "../middlewares/extractJWT";
+import { uploadAnnouncementFiles } from "../middlewares/upload";
 
 const router = express.Router();
 
@@ -50,7 +50,7 @@ router.post(
   "/create",
   extractJWT,
   checkAdmin,
-  uploadAnnouncementFiles.array("attachments", 5),
+  uploadAnnouncementFiles,
   createAnnouncement,
 );
 
@@ -129,7 +129,7 @@ router.patch(
   "/update/:id",
   extractJWT,
   checkAdmin,
-  uploadAnnouncementFiles.array("attachments", 5),
+  uploadAnnouncementFiles,
   updateAnnouncement,
 );
 

@@ -8,6 +8,7 @@ import swaggerUi from "swagger-ui-express";
 import config from "./config/config";
 import logging from "./config/logging";
 import { swaggerSpec } from "./config/swagger";
+import { multerErrorHandler } from "./middlewares/upload";
 import adminRoutes from "./router/admin";
 import airQualityRoutes from "./router/airquality";
 import announcementRoutes from "./router/announcement";
@@ -94,6 +95,9 @@ app.use("/api", resetPasswordRoutes);
 app.use("/comments", commentRoutes);
 app.use("/announcement", announcementRoutes);
 app.use("/air-quality", airQualityRoutes);
+
+// Multer error handling middleware
+app.use(multerErrorHandler);
 
 // Error handling for not found routes
 app.use((req, res) => {

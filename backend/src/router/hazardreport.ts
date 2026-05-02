@@ -1,7 +1,7 @@
 import express from "express";
 import controller from "../controllers/hazardreport";
 import { checkAdmin, extractJWT } from "../middlewares/extractJWT";
-import upload from "../middlewares/upload";
+import { uploadHazardFiles } from "../middlewares/upload";
 
 const router = express.Router();
 
@@ -49,7 +49,7 @@ const router = express.Router();
 router.post(
   "/create",
   extractJWT,
-  upload.array("images", 10),
+  uploadHazardFiles,
   controller.createHazardReport,
 );
 

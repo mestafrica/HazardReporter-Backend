@@ -9,8 +9,8 @@ import {
 } from "../controllers/announcement";
 import hazardReportController from "../controllers/hazardreport";
 import { checkAuth, hasPermission } from "../middlewares/auth";
-import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
 import { checkAdmin, extractJWT } from "../middlewares/extractJWT";
+import { uploadAnnouncementFiles } from "../middlewares/upload";
 
 const router = express.Router();
 
@@ -58,7 +58,7 @@ router.post(
   "/admin/announcements",
   extractJWT,
   checkAdmin,
-  uploadAnnouncementFiles.array("attachments", 5),
+  uploadAnnouncementFiles,
   createAnnouncement,
 );
 router.get("/admin/announcements", getAllAnnouncements);
@@ -67,7 +67,7 @@ router.patch(
   "/admin/announcements/:id",
   extractJWT,
   checkAdmin,
-  uploadAnnouncementFiles.array("attachments", 5),
+  uploadAnnouncementFiles,
   updateAnnouncement,
 );
 router.delete(
