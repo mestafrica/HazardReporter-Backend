@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { ResetTokenModel } from "../models/token";

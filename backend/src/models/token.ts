@@ -1,10 +1,10 @@
-import { Schema, Types, model } from "mongoose";
+import { Schema, model } from "mongoose";
 
 
 
 
 const resetTokenSchema = new Schema({
-    userId: { type: Types.ObjectId, required: true, ref: 'User' },
+    userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
     expired: { type: Boolean, default: false },
     expiresAt: {
         type: Date,

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, {Schema} from "mongoose";
 import { IComment } from "../interfaces/comment"; // 👈 imported from interfaces folder
 
 const commentSchema = new mongoose.Schema(
@@ -9,12 +9,12 @@ const commentSchema = new mongoose.Schema(
       trim: true,
     },
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     targetId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       required: true,
       refPath: "targetType",
     },
