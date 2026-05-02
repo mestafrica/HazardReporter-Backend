@@ -1,0 +1,8 @@
+src/
+*.ts
+.env
+.env.*
+nodemon.json
+tsconfig*.json
+eslint.config.cjs
+README.md

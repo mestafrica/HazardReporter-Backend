@@ -108,26 +108,30 @@ app.use((req, res) => {
 });
 
 // Listen for incoming requests
-const port = Number(config.server.port) || 1337;
+const PORT = Number(process.env.PORT) || Number(config.server.port) || 3000;
 
-const startServer = (currentPort: number) => {
-  const server = app.listen(currentPort, () => {
-    console.log(`App listening on port ${currentPort}`);
+if (process.env.NODE_ENV === "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
   });
+} else {
+  const startServer = (currentPort: number) => {
+    const server = app.listen(currentPort, () => {
+      console.log(`Server running on port ${currentPort}`);
+    });
 
-  server.on("error", (err: NodeJS.ErrnoException) => {
-    if (err.code === "EADDRINUSE") {
-      console.log(
-        `Port ${currentPort} is already in use. Trying port ${currentPort + 1}...`,
-      );
-      startServer(currentPort + 1);
-    } else {
-      console.error("Server error:", err);
-    }
-  });
-};
+    server.on("error", (err: NodeJS.ErrnoException) => {
+      if (err.code === "EADDRINUSE") {
+        console.log(`Port ${currentPort} in use, trying ${currentPort + 1}...`);
+        startServer(currentPort + 1);
+      } else {
+        console.error("Server error:", err);
+      }
+    });
+  };
 
-startServer(port);
+  startServer(PORT);
+}
 
 // Error handling middleware
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {

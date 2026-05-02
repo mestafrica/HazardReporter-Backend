@@ -1,8 +1,7 @@
 import dotenv from "dotenv";
-import path from "path";
 
 // Force dotenv to look in the right place
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+// dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 dotenv.config();
 
 // Load environment variables from .env file

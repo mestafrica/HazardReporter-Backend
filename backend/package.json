@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node dist/index.js",
-    "build": "tsc",
     "dev": "nodemon --exec tsx src/index.ts",
-    "postInstall": "npm run build",
-    "start:prod": "node dist/index.js",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint 'src/**/*.{ts,js}' --ext .ts --max-warnings=0",
     "test": "vitest"
   },
