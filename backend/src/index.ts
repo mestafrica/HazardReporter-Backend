@@ -18,6 +18,8 @@ import healthRoutes from "./router/health";
 import resetPasswordRoutes from "./router/resetpassword";
 import userRoutes from "./router/user";
 import commentRoutes from "./router/comment";
+import notificationRoutes from "./router/notification";
+import { initNotificationSocket } from "./services/notificationSocket";
 dotenv.config();
 
 const NAMESPACE = "Server";
@@ -105,6 +107,7 @@ app.get("/", (req, res) => {
 app.use("/api", healthRoutes);
 app.use("/api", userRoutes);
 app.use("/api", adminRoutes);
+app.use("/api", notificationRoutes);
 app.use("/admin/hazard", hazardRoutes);
 app.use("/hazard", hazardReport);
 app.use("/api", resetPasswordRoutes);
@@ -131,6 +134,7 @@ const port = Number(config.server.port) || 1337;
 
 const startServer = (currentPort: number) => {
   const server = app.listen(currentPort, () => {
+    initNotificationSocket(server);
     console.log(`App listening on port ${currentPort}`);
   });
 

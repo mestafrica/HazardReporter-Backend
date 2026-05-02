@@ -4,6 +4,7 @@ import HazardReport from "../models/hazardreport";
 import User from "../models/user";
 import { hazardreportValidator } from "../validators/hazardreport";
 import { IHazardReport } from "../interfaces/hazardreport";
+import { createNotification } from "../services/notification";
 
 const NAMESPACE = "HazardReport";
 
@@ -47,6 +48,36 @@ const createHazardReport = async (
 
     user.reports.push(hazardReport._id);
     await user.save();
+
+    try {
+      const submittedLocation =
+        hazardReport.location ||
+        [hazardReport.city, hazardReport.country].filter(Boolean).join(", ");
+
+      await createNotification({
+        type: "report",
+        title: "New hazard report submitted",
+        message: `New report submitted from ${submittedLocation}`,
+        entityType: "hazardReport",
+        entityId: hazardReport._id,
+        link: "/admin-dashboard/moderation",
+        metadata: {
+          reportId: hazardReport._id.toString(),
+          title: hazardReport.title,
+          hazardtype: hazardReport.hazardtype,
+          status: hazardReport.status,
+          location: hazardReport.location,
+          city: hazardReport.city,
+          country: hazardReport.country,
+          reporter: user.userName,
+        },
+      });
+    } catch (notificationError) {
+      console.error(
+        "Failed to create hazard report notification:",
+        notificationError,
+      );
+    }
 
     return res
       .status(201)
